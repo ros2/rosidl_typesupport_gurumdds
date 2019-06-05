@@ -167,7 +167,6 @@ const rosidl_message_type_support_t *
 __ros_msg_type = '__'.join(message.structure.namespaced_type.namespaces + [message.structure.namespaced_type.name])
 __dds_msg_type_prefix = '_'.join(message.structure.namespaced_type.namespaces + ['dds_', message.structure.namespaced_type.name])
 __dds_msg_type = __dds_msg_type_prefix + '_'
-__subfolder = message.structure.namespaced_type.namespaces[1]
 }@
 
 static uint32_t
