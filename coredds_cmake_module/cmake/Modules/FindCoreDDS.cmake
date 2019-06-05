@@ -1,48 +1,9 @@
-# Copyright 2019 GurumNetworks, Inc.
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-
-###############################################################################
-#
-# CMake module for finding GurumNetworks CoreDDS.
-#
-# Input variables:
-#
-# - COREDDS_HOME: Header files and libraries will be searched for in
-#   `${COREDDS_HOME}/include` and ${COREDDS_HOME}/lib` respectively.
-#
-# Output variables:
-#
-# - CoreDDS_FOUND: flag indicating if the package was found
-# - CoreDDS_INCLUDE_DIR: Paths to the header files
-# - CoreDDS_LIBRARIES: Name to the C++ libraries including the path
-# - CoreDDS_LIBRARY_DIRS: Paths to the libraries
-# - CoreDDS_COREIDL: Path to the idl2code generator
-#
-# Example usage:
-#
-#   find_package(coredds_cmake_module REQUIRED)
-#   find_package(CoreDDS MODULE)
-#   # use CoreDDS_* variables
-#
-###############################################################################
-
-# lint_cmake: -convention/filename, -package/stdargs
-
 if(DEFINED CoreDDS_FOUND)
   return()
 endif()
 set(CoreDDS_FOUND FALSE)
+
+# TODO: Implement support for other OS
 
 file(TO_CMAKE_PATH "$ENV{COREDDS_HOME}" _COREDDS_HOME)
 
@@ -62,7 +23,7 @@ if(NOT _COREDDS_HOME STREQUAL "")
   endif()
 
   if(WIN32)
-    # TODO(junho): CoreIDL support for Windows
+    # TODO
   else()
     set(CoreDDS_COREIDL "${_COREDDS_HOME}/tools/coreidl")
     if(NOT EXISTS "${CoreDDS_COREIDL}")

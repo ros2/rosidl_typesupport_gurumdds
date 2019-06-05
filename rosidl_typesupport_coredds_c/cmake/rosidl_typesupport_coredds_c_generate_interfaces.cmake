@@ -1,10 +1,10 @@
-# Copyright 2019 GurumNetworks, Inc.
+# Copyright 2016 Open Source Robotics Foundation, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#     http://www.apache.org/licenses/LICENSE-2.0
+#		 http://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -12,70 +12,120 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-set(_output_path
-  "${CMAKE_CURRENT_BINARY_DIR}/rosidl_typesupport_coredds_c/${PROJECT_NAME}")
-set(_dds_output_path "${CMAKE_CURRENT_BINARY_DIR}/rosidl_typesupport_coredds_cpp/${PROJECT_NAME}")
-set(_dds_idl_base_path "${CMAKE_CURRENT_BINARY_DIR}/rosidl_generator_dds_idl")
+set(_ros_idl_files "")
+foreach(_idl_file ${rosidl_generate_interfaces_IDL_FILES})
+  get_filename_component(_extension "${_idl_file}" EXT)
+  # Skip .srv files
+  if(_extension STREQUAL ".msg")
+    list(APPEND _ros_idl_files "${_idl_file}")
+  endif()
+endforeach()
 
 set(_dds_idl_files "")
+set(_dds_idl_base_path "${CMAKE_CURRENT_BINARY_DIR}/rosidl_generator_dds_idl")
+foreach(_idl_file ${rosidl_generate_interfaces_IDL_FILES})
+  get_filename_component(_extension "${_idl_file}" EXT)
+  if(_extension STREQUAL ".msg")
+    get_filename_component(_parent_folder "${_idl_file}" DIRECTORY)
+    get_filename_component(_parent_folder "${_parent_folder}" NAME)
+    get_filename_component(_name "${_idl_file}" NAME_WE)
+    list(APPEND _dds_idl_files
+      "${_dds_idl_base_path}/${PROJECT_NAME}/${_parent_folder}/dds_coredds/${_name}_.idl")
+  endif()
+endforeach()
+
+set(_output_path "${CMAKE_CURRENT_BINARY_DIR}/rosidl_typesupport_coredds_c/${PROJECT_NAME}")
+set(_dds_output_path "${CMAKE_CURRENT_BINARY_DIR}/rosidl_typesupport_coredds_cpp/${PROJECT_NAME}")
 set(_generated_files "")
 set(_generated_external_files "")
-foreach(_abs_idl_file ${rosidl_generate_interfaces_ABS_IDL_FILES})
-  get_filename_component(_parent_folder "${_abs_idl_file}" DIRECTORY)
+foreach(_idl_file ${rosidl_generate_interfaces_IDL_FILES})
+  get_filename_component(_parent_folder "${_idl_file}" DIRECTORY)
   get_filename_component(_parent_folder "${_parent_folder}" NAME)
-  get_filename_component(_idl_name "${_abs_idl_file}" NAME_WE)
-  # Turn idl name info file names
-  string_camel_case_to_lower_case_underscore("${_idl_name}" _header_name)
-  if(_parent_folder STREQUAL "msg")
-    list(APPEND _generated_external_files "${_dds_output_path}/${_parent_folder}/dds_coredds/src/${PROJECT_NAME}_${_parent_folder}_dds__${_idl_name}_TypeSupport.c")
-    list(APPEND _generated_external_files "${_dds_output_path}/${_parent_folder}/dds_coredds/include/${PROJECT_NAME}/${_parent_folder}/dds_/${_idl_name}_TypeSupport.h")
-    list(APPEND _generated_external_files "${_dds_output_path}/${_parent_folder}/dds_coredds/include/${PROJECT_NAME}/${_parent_folder}/dds_/${_idl_name}_.h")
-  elseif(_parent_folder STREQUAL "srv")
-    list(APPEND _generated_external_files "${_dds_output_path}/${_parent_folder}/dds_coredds/src/${PROJECT_NAME}_${_parent_folder}_dds__${_idl_name}_Request_TypeSupport.c")
-    list(APPEND _generated_external_files "${_dds_output_path}/${_parent_folder}/dds_coredds/include/${PROJECT_NAME}/${_parent_folder}/dds_/${_idl_name}_Request_TypeSupport.h")
-    list(APPEND _generated_external_files "${_dds_output_path}/${_parent_folder}/dds_coredds/include/${PROJECT_NAME}/${_parent_folder}/dds_/${_idl_name}_Request_.h")
-    list(APPEND _generated_external_files "${_dds_output_path}/${_parent_folder}/dds_coredds/src/${PROJECT_NAME}_${_parent_folder}_dds__${_idl_name}_Response_TypeSupport.c")
-    list(APPEND _generated_external_files "${_dds_output_path}/${_parent_folder}/dds_coredds/include/${PROJECT_NAME}/${_parent_folder}/dds_/${_idl_name}_Response_TypeSupport.h")
-    list(APPEND _generated_external_files "${_dds_output_path}/${_parent_folder}/dds_coredds/include/${PROJECT_NAME}/${_parent_folder}/dds_/${_idl_name}_Response_.h")
-  elseif(_parent_folder STREQUAL "action")
-    set(_suffixes _Goal _SendGoal_Request _SendGoal_Response _Result _GetResult_Request _GetResult_Response _Feedback _FeedbackMessage)
-    foreach(_idl_suffix ${_suffixes})
-      list(APPEND _generated_external_files "${_dds_output_path}/${_parent_folder}/dds_coredds/src/${PROJECT_NAME}_${_parent_folder}_dds__${_idl_name}${_idl_suffix}_TypeSupport.c")
-      list(APPEND _generated_external_files "${_dds_output_path}/${_parent_folder}/dds_coredds/include/${PROJECT_NAME}/${_parent_folder}/dds_/${_idl_name}${_idl_suffix}_TypeSupport.h")
-      list(APPEND _generated_external_files "${_dds_output_path}/${_parent_folder}/dds_coredds/include/${PROJECT_NAME}/${_parent_folder}/dds_/${_idl_name}${_idl_suffix}_.h")
+  get_filename_component(_extension "${_idl_file}" EXT)
+  get_filename_component(_msg_name "${_idl_file}" NAME_WE)
+  string_camel_case_to_lower_case_underscore("${_msg_name}" _header_name)
+  if(_extension STREQUAL ".msg" AND _msg_name MATCHES "Response$|Request$")
+    # Don't do anything
+  elseif(_extension STREQUAL ".msg")
+    set(_allowed_parent_folders "msg" "srv" "action")
+    if(NOT _parent_folder IN_LIST _allowed_parent_folders)
+      message(FATAL_ERROR "Interface file with unknown parent folder: ${_idl_file}")
+    endif()
+    #list(APPEND _generated_external_files "${_dds_output_path}/${_parent_folder}/dds_coredds/${_msg_name}_.cdr")
+    list(APPEND _generated_external_files "${_dds_output_path}/${_parent_folder}/dds_coredds/src/${PROJECT_NAME}_${_parent_folder}_dds__${_msg_name}_TypeSupport.c")
+    list(APPEND _generated_external_files "${_dds_output_path}/${_parent_folder}/dds_coredds/include/${PROJECT_NAME}/${_parent_folder}/dds_/${_msg_name}_TypeSupport.h")
+    list(APPEND _generated_external_files "${_dds_output_path}/${_parent_folder}/dds_coredds/include/${PROJECT_NAME}/${_parent_folder}/dds_/${_msg_name}_.h")
+    list(APPEND _generated_files "${_output_path}/${_parent_folder}/${_header_name}__rosidl_typesupport_coredds_c.h")
+    list(APPEND _generated_files "${_output_path}/${_parent_folder}/dds_coredds_c/${_header_name}__type_support_c.cpp")
+  elseif(_extension STREQUAL ".srv")
+    set(_allowed_parent_folders "srv" "action")
+    if(NOT _parent_folder IN_LIST _allowed_parent_folders)
+      message(FATAL_ERROR "Interface file with unknown parent folder: ${_idl_file}")
+    endif()
+    list(APPEND _generated_files "${_output_path}/${_parent_folder}/${_header_name}__rosidl_typesupport_coredds_c.h")
+    list(APPEND _generated_files "${_output_path}/${_parent_folder}/dds_coredds_c/${_header_name}__type_support_c.cpp")
+    list(APPEND _generated_files "${_output_path}/${_parent_folder}/dds_coredds_c/${_header_name}__request__type_support_c.cpp")
+    list(APPEND _generated_files "${_output_path}/${_parent_folder}/dds_coredds_c/${_header_name}__response__type_support_c.cpp")
+  else()
+    message(FATAL_ERROR "Interface file with unknown extension: ${_idl_file}")
+  endif()
+endforeach()
+
+if(NOT WIN32)
+  set(_coredds_compile_flags)
+  if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+    set(_coredds_compile_flags
+      "-Wno-deprecated-register"
+      "-Wno-return-type-c-linkage"
+      "-Wno-unused-parameter"
+    )
+  elseif(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+    set(_coredds_compile_flags
+      # no-strict-aliasing necessary only for Release builds
+      "-Wno-strict-aliasing"
+      "-Wno-unused-parameter"
+    )
+  endif()
+  if(NOT _coredds_compile_flags STREQUAL "")
+    string(REPLACE ";" " " _coredds_compile_flags "${_coredds_compile_flags}")
+    foreach(_gen_file ${_generated_external_files})
+      set_source_files_properties("${_gen_file}"
+        PROPERTIES COMPILE_FLAGS "${_coredds_compile_flags}")
     endforeach()
   endif()
-
-  list(APPEND _generated_files "${_output_path}/${_parent_folder}/${_header_name}__rosidl_typesupport_coredds_c.h")
-  list(APPEND _generated_files "${_output_path}/${_parent_folder}/dds_coredds/${_header_name}__type_support_c.cpp")
-  list(APPEND _dds_idl_files "${_dds_idl_base_path}/${PROJECT_NAME}/${_parent_folder}/dds_coredds/${_idl_name}_.idl")
-endforeach()
+endif()
 
 set(_dependency_files "")
 set(_dependencies "")
 foreach(_pkg_name ${rosidl_generate_interfaces_DEPENDENCY_PACKAGE_NAMES})
-  foreach(_idl_file ${${_pkg_name}_IDL_FILES})
-    set(_abs_idl_file "${${_pkg_name}_DIR}/../${_idl_file}")
-    normalize_path(_abs_idl_file "${_abs_idl_file}")
-    list(APPEND _dependency_files "${_abs_idl_file}")
-    list(APPEND _dependencies "${_pkg_name}:${_abs_idl_file}")
+  foreach(_idl_file ${${_pkg_name}_INTERFACE_FILES})
+    get_filename_component(_extension "${_idl_file}" EXT)
+    if(_extension STREQUAL ".msg")
+      get_filename_component(_parent_folder "${_idl_file}" DIRECTORY)
+      get_filename_component(_parent_folder "${_parent_folder}" NAME)
+      get_filename_component(_name "${_idl_file}" NAME_WE)
+      set(_abs_idl_file "${${_pkg_name}_DIR}/../${_parent_folder}/dds_coredds/${_name}_.idl")
+      normalize_path(_abs_idl_file "${_abs_idl_file}")
+      list(APPEND _dependency_files "${_abs_idl_file}")
+      set(_abs_idl_file "${${_pkg_name}_DIR}/../${_idl_file}")
+      normalize_path(_abs_idl_file "${_abs_idl_file}")
+      list(APPEND _dependencies "${_pkg_name}:${_abs_idl_file}")
+    endif()
   endforeach()
 endforeach()
 
 set(target_dependencies
   "${rosidl_typesupport_coredds_c_BIN}"
   ${rosidl_typesupport_coredds_c_GENERATOR_FILES}
-  "${rosidl_typesupport_coredds_c_TEMPLATE_DIR}/idl__rosidl_typesupport_coredds_c.h.em"
-  "${rosidl_typesupport_coredds_c_TEMPLATE_DIR}/idl__dds_coredds__type_support_c.cpp.em"
-  "${rosidl_typesupport_coredds_c_TEMPLATE_DIR}/msg__rosidl_typesupport_coredds_c.h.em"
   "${rosidl_typesupport_coredds_c_TEMPLATE_DIR}/msg__type_support_c.cpp.em"
-  "${rosidl_typesupport_coredds_c_TEMPLATE_DIR}/srv__rosidl_typesupport_coredds_c.h.em"
   "${rosidl_typesupport_coredds_c_TEMPLATE_DIR}/srv__type_support_c.cpp.em"
-  ${rosidl_generate_interfaces_ABS_IDL_FILES}
   ${_dependency_files})
 foreach(dep ${target_dependencies})
   if(NOT EXISTS "${dep}")
-    message(FATAL_ERROR "Target dependency '${dep}' does not exist")
+    get_property(is_generated SOURCE "${dep}" PROPERTY GENERATED)
+    if(NOT ${_is_generated})
+      message(FATAL_ERROR "Target dependency '${dep}' does not exist")
+    endif()
   endif()
 endforeach()
 
@@ -83,7 +133,7 @@ set(generator_arguments_file "${CMAKE_CURRENT_BINARY_DIR}/rosidl_typesupport_cor
 rosidl_write_generator_arguments(
   "${generator_arguments_file}"
   PACKAGE_NAME "${PROJECT_NAME}"
-  IDL_TUPLES "${rosidl_generate_interfaces_IDL_TUPLES}"
+  ROS_INTERFACE_FILES "${rosidl_generate_interfaces_IDL_FILES}"
   ROS_INTERFACE_DEPENDENCIES "${_dependencies}"
   OUTPUT_DIR "${_output_path}"
   TEMPLATE_DIR "${rosidl_typesupport_coredds_c_TEMPLATE_DIR}"
@@ -97,7 +147,7 @@ add_custom_command(
   --generator-arguments-file "${generator_arguments_file}"
   DEPENDS
     ${target_dependencies}
-    ${_generated_external_files}
+    ${generated_external_files}
     ${_dds_idl_files}
   COMMENT "Generating C type support for CoreDDS"
   VERBATIM
@@ -222,32 +272,4 @@ if(NOT rosidl_generate_interfaces_SKIP_INSTALL)
 
   rosidl_export_typesupport_libraries(${_target_suffix}
     ${rosidl_generate_interfaces_TARGET}${_target_suffix})
-endif()
-
-if(BUILD_TESTING AND rosidl_generate_interfaces_ADD_LINTER_TESTS)
-  if(NOT _generated_files STREQUAL "")
-    find_package(ament_cmake_cppcheck REQUIRED)
-    ament_cppcheck(
-      TESTNAME "cppcheck_rosidl_typesupport_coredds_c"
-      ${_generated_files})
-
-    find_package(ament_cmake_cpplint REQUIRED)
-    get_filename_component(_cpplint_root "${_output_path}" DIRECTORY)
-    ament_cpplint(
-      TESTNAME "cpplint_rosidl_typesupport_coredds_c"
-      # the generated code might contain longer lines for templated types
-      MAX_LINE_LENGTH 999
-      # the generated code might contain long functions without comments
-      FILTERS "-readability/fn_size"
-      ROOT "${_cpplint_root}"
-      ${_generated_files})
-
-    find_package(ament_cmake_uncrustify REQUIRED)
-    ament_uncrustify(
-      TESTNAME "uncrustify_rosidl_typesupport_coredds_c"
-      # the generated code might contain longer lines for templated types
-      # set the value to zero to tell uncrustify to ignore line lengths
-      MAX_LINE_LENGTH 0
-      ${_generated_files})
-  endif()
 endif()
