@@ -1,5 +1,5 @@
-# Copyright 2016 Open Source Robotics Foundation, Inc.
-#                          
+# Copyright 2019 GurumNetworks, Inc.
+#
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -12,8 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import os                  
-import sys
+import os
 
 from rosidl_cmake import convert_camel_case_to_lower_case_underscore
 from rosidl_cmake import expand_template
@@ -33,7 +32,7 @@ def generate_typesupport_coredds_c(args):
         '%s__type_support_c.cpp',
     }
 
-    mapping_srvs = {       
+    mapping_srvs = {
         os.path.join(template_dir, 'srv__rosidl_typesupport_coredds_c.h.em'):
         '%s__rosidl_typesupport_coredds_c.h',
         os.path.join(template_dir, 'srv__type_support_c.cpp.em'):
@@ -72,19 +71,19 @@ def generate_typesupport_coredds_c(args):
                     generated_file, generated_filename %
                     convert_camel_case_to_lower_case_underscore(spec.base_type.type))
 
-                data = {   
-                    'spec': spec,                   
+                data = {
+                    'spec': spec,
                     'pkg': spec.base_type.pkg_name,
                     'msg': spec.msg_name,
-                    'type': spec.base_type.type,    
+                    'type': spec.base_type.type,
                     'subfolder': subfolder,
                 }
-                data.update(functions)          
-                expand_template(                    
+                data.update(functions)
+                expand_template(
                     template_file, data, generated_file,
                     minimum_timestamp=latest_target_timestamp)
 
-        elif extension == '.srv':                   
+        elif extension == '.srv':
             spec = parse_service_file(pkg_name, idl_file)
             validate_field_types(spec, known_msg_types)
             for template_file, generated_filename in mapping_srvs.items():
@@ -96,10 +95,9 @@ def generate_typesupport_coredds_c(args):
                     convert_camel_case_to_lower_case_underscore(spec.srv_name))
 
                 data = {'spec': spec, 'subfolder': subfolder}
-                data.update(functions)          
+                data.update(functions)
                 expand_template(
                     template_file, data, generated_file,
                     minimum_timestamp=latest_target_timestamp)
 
     return 0
-

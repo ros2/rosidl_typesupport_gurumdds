@@ -1,5 +1,5 @@
-// Copyright 2016 Open Source Robotics Foundation, Inc.
-//  
+// Copyright 2019 GurumNetworks, Inc.
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -15,8 +15,8 @@
 #ifndef ROSIDL_TYPESUPPORT_COREDDS_C__VISIBILITY_CONTROL_H_
 #define ROSIDL_TYPESUPPORT_COREDDS_C__VISIBILITY_CONTROL_H_
 
-#ifdef __cplusplus         
-extern "C"                 
+#ifdef __cplusplus
+extern "C"
 {
 #endif
 
@@ -24,7 +24,7 @@ extern "C"
 //     https://gcc.gnu.org/wiki/Visibility
 
 #if defined _WIN32 || defined __CYGWIN__
-  #ifdef __GNUC__          
+  #ifdef __GNUC__
     #define ROSIDL_TYPESUPPORT_COREDDS_C_EXPORT __attribute__ ((dllexport))
     #define ROSIDL_TYPESUPPORT_COREDDS_C_IMPORT __attribute__ ((dllimport))
   #else
@@ -35,7 +35,7 @@ extern "C"
     #define ROSIDL_TYPESUPPORT_COREDDS_C_PUBLIC ROSIDL_TYPESUPPORT_COREDDS_C_EXPORT
   #else
     #define ROSIDL_TYPESUPPORT_COREDDS_C_PUBLIC ROSIDL_TYPESUPPORT_COREDDS_C_IMPORT
-  #endif                   
+  #endif
   #define ROSIDL_TYPESUPPORT_COREDDS_C_LOCAL
 #else
   #define ROSIDL_TYPESUPPORT_COREDDS_C_EXPORT __attribute__ ((visibility("default")))
@@ -43,14 +43,14 @@ extern "C"
   #if __GNUC__ >= 4
     #define ROSIDL_TYPESUPPORT_COREDDS_C_PUBLIC __attribute__ ((visibility("default")))
     #define ROSIDL_TYPESUPPORT_COREDDS_C_LOCAL  __attribute__ ((visibility("hidden")))
-  #else                    
+  #else
     #define ROSIDL_TYPESUPPORT_COREDDS_C_PUBLIC
     #define ROSIDL_TYPESUPPORT_COREDDS_C_LOCAL
   #endif
 #endif
-    
+
 #ifdef __cplusplus
-} 
+}
 #endif
-    
+
 #endif  // ROSIDL_TYPESUPPORT_COREDDS_C__VISIBILITY_CONTROL_H_

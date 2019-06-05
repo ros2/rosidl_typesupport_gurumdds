@@ -1,6 +1,20 @@
+# Copyright 2019 GurumNetworks, Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 import os
-import subprocess          
-import sys                 
+import subprocess
+import sys
 
 from rosidl_cmake import convert_camel_case_to_lower_case_underscore
 from rosidl_cmake import expand_template
@@ -11,14 +25,14 @@ from rosidl_parser import validate_field_types
 
 
 def parse_ros_interface_files(pkg_name, ros_interface_files):
-    message_specs = []     
-    service_specs = []     
+    message_specs = []
+    service_specs = []
     for idl_file in ros_interface_files:
-        extension = os.path.splitext(idl_file)[1] 
+        extension = os.path.splitext(idl_file)[1]
         if extension == '.msg':
             message_spec = parse_message_file(pkg_name, idl_file)
             message_specs.append((idl_file, message_spec))
-        elif extension == '.srv':       
+        elif extension == '.srv':
             service_spec = parse_service_file(pkg_name, idl_file)
             service_specs.append((idl_file, service_spec))
     return (message_specs, service_specs)
@@ -38,28 +52,29 @@ def generate_dds_coredds_cpp(
             os.path.dirname(os.path.dirname(os.path.normpath(idl_path))))
         if idl_base_path not in include_dirs:
             include_dirs.append(idl_base_path)
-  
+
     for index, idl_file in enumerate(dds_interface_files):
         assert os.path.exists(idl_file), 'Could not find IDL file: ' + idl_file
 
         # get two level of parent folders for idl file
         folder = os.path.dirname(idl_file)
         parent_folder = os.path.dirname(folder)
-        output_path = os.path.join(     
+        output_path = os.path.join(
             output_basepath,
             os.path.basename(parent_folder),
-            os.path.basename(folder))       
-        try:               
-            os.makedirs(output_path)    
+            os.path.basename(folder))
+        try:
+            os.makedirs(output_path)
         except FileExistsError:
-            pass           
+            pass
 
-        _modify(idl_file, pkg_name, os.path.splitext(os.path.basename(idl_file))[0], (str(os.path.basename(parent_folder)) == "srv"))
+        _modify(idl_file, pkg_name, os.path.splitext(os.path.basename(idl_file))[0],
+                (str(os.path.basename(parent_folder)) == 'srv'))
 
-        cmd = [idl_pp]     
+        cmd = [idl_pp]
         for include_dir in include_dirs:
-            cmd += ['-I', include_dir]  
-        cmd += [           
+            cmd += ['-I', include_dir]
+        cmd += [
             'c',
             '--case-sensitive',
             idl_file,
@@ -69,9 +84,10 @@ def generate_dds_coredds_cpp(
         msg_name = os.path.splitext(os.path.basename(idl_file))[0]
         count = 1
         max_count = 5
-        
+        parent = os.path.basename(parent_folder)
+
         while True:
-            subprocess.check_call(cmd)  
+            subprocess.check_call(cmd)
 
             # fail safe if the generator does not work as expected
             any_missing = False
@@ -79,13 +95,13 @@ def generate_dds_coredds_cpp(
                 add_path = ''
                 temp_output_path = ''
                 if suffix[-1] == 'h':
-                    add_path = '/include/' + pkg_name + '/' + os.path.basename(parent_folder) + '/' + 'dds_/'
+                    add_path = '/include/' + pkg_name + '/' + parent + '/' + 'dds_/'
                 else:
-                    add_path = '/src/' + pkg_name + '_' + os.path.basename(parent_folder) + '_' + 'dds__'
+                    add_path = '/src/' + pkg_name + '_' + parent + '_' + 'dds__'
                 temp_output_path = output_path + add_path
                 filename = temp_output_path + msg_name + suffix
                 if not os.path.exists(filename):
-                    any_missing = True          
+                    any_missing = True
                     break
             if not any_missing:
                 break
@@ -100,16 +116,17 @@ def generate_dds_coredds_cpp(
 
     return 0
 
+
 def _modify(filename, pkg_name, msg_name, is_srv):
     modified = False
     with open(filename, 'r') as h:
         lines = h.read().split('\n')
-    if is_srv == True:
+    if is_srv is True:
         modified = add_seq_number(lines)
-    #modified = relative_to_absolute(pkg_name, msg_name, lines)
     if modified:
         with open(filename, 'w') as h:
             h.write('\n'.join(lines))
+
 
 def add_seq_number(lines):
     for i, line in enumerate(lines):
@@ -123,15 +140,6 @@ def add_seq_number(lines):
             break
     return lines
 
-def relative_to_absolute(pkg_name, msg_name, lines): # TODO: remove this
-    for i, line in enumerate(lines):
-        if line.startswith('#include "/'):
-            continue
-        if line.startswith('#include "'):
-            ref_path = line[10:-1]
-            ref_pkg_name = ref_path.split('/')[0]
-            lines[i] = line.replace('#include "', '#include "/home/junho/ros2_ws/build/' + ref_pkg_name + '/rosidl_generator_dds_idl/')
-    return lines
 
 def generate_cpp(args, message_specs, service_specs, known_msg_types):
     template_dir = args['template_dir']

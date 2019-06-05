@@ -1,5 +1,5 @@
-// Copyright 2016 Open Source Robotics Foundation, Inc.
-//                         
+// Copyright 2019 GurumNetworks, Inc.
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -18,7 +18,7 @@
 #include "rosidl_typesupport_coredds_c/visibility_control.h"
 
 #if __cplusplus
-extern "C"                 
+extern "C"
 {
 #endif
 
