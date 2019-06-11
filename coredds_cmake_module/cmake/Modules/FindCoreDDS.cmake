@@ -25,8 +25,8 @@
 #
 # - CoreDDS_FOUND: flag indicating if the package was found
 # - CoreDDS_INCLUDE_DIR: Paths to the header files
-# - CoreDDS_LIBRARIES: Name to the C++ libraries including the path
-# - CoreDDS_LIBRARY_DIRS: Paths to the libraries
+# - CoreDDS_LIBRARY: Name to the C++ library including the path
+# - CoreDDS_LIBRARY_DIR: Path to the library
 # - CoreDDS_COREIDL: Path to the idl2code generator
 #
 # Example usage:
@@ -50,19 +50,53 @@ if(NOT _COREDDS_HOME STREQUAL "")
   message(STATUS "Found CoreDDS:" ${_COREDDS_HOME})
   set(CoreDDS_HOME "${_COREDDS_HOME}")
   set(CoreDDS_INCLUDE_DIR "${_COREDDS_HOME}/include/")
-  set(CoreDDS_LIBRARY_DIRS "${_COREDDS_HOME}/lib/")
-  set(CoreDDS_LIBRARIES "${CoreDDS_LIBRARY_DIRS}libdds.so")
+  set(CoreDDS_LIBRARY_DIR "${_COREDDS_HOME}/lib/")
+  set(CoreDDS_LIBRARY "${CoreDDS_LIBRARY_DIR}libdds.so")
 
-  file(GLOB_RECURSE library RELATIVE "${CoreDDS_HOME}" "${CoreDDS_LIBRARIES}")
+  file(GLOB library "${CoreDDS_LIBRARY}")
   if(library)
     set(CoreDDS_FOUND TRUE)
   else()
-    set(CoreDDS_FOUND FALSE)
-    return()
+    set(os_dir "")
+    if(WIN32)
+      # TODO(clemjh): Support for Windows
+      message(FATAL_ERROR "This operating system is not supported yet.")
+      return()
+    else()
+      if(APPLE)
+        message(FATAL_ERROR "This operating system is not supported yet.")
+        return()
+      else() # Linux
+        execute_process(COMMAND lsb_release -is OUTPUT_VARIABLE LSB_RELEASE_DIST OUTPUT_STRIP_TRAILING_WHITESPACE)
+        if(LSB_RELEASE_DIST STREQUAL "Ubuntu")
+          execute_process(COMMAND lsb_release -cs OUTPUT_VARIABLE LSB_RELEASE_VER OUTPUT_STRIP_TRAILING_WHITESPACE)
+          if(LSB_RELEASE_VER STREQUAL "bionic")
+            set(os_dir "ubuntu-18.04/")
+          elseif(LSB_RELEASE_VER STREQUAL "xenial")
+            set(os_dir "ubuntu-16.04/")
+          else()
+            message(FATAL_ERROR "This operating system is not supported.")
+            return()
+          endif()
+        else()
+          message(FATAL_ERROR "This operating system is not supported yet.")
+          return()
+        endif()
+      endif()
+    endif()
+    set(CoreDDS_LIBRARY "${CoreDDS_LIBRARY_DIR}${os_dir}libdds.so")
+  
+    file(GLOB library "${CoreDDS_LIBRARY}")
+    if(library)
+      set(CoreDDS_FOUND TRUE)
+    else()
+      set(CoreDDS_FOUND FALSE)
+      return()
+    endif()
   endif()
 
   if(WIN32)
-    # TODO(junho): CoreIDL support for Windows
+    # TODO(clemjh): CoreIDL support for Windows
   else()
     set(CoreDDS_COREIDL "${_COREDDS_HOME}/tools/coreidl")
     if(NOT EXISTS "${CoreDDS_COREIDL}")
@@ -81,6 +115,6 @@ find_package_handle_standard_args(CoreDDS
   FOUND_VAR CoreDDS_FOUND
   REQUIRED_VARS
   CoreDDS_INCLUDE_DIR
-  CoreDDS_LIBRARY_DIRS
-  CoreDDS_LIBRARIES
+  CoreDDS_LIBRARY_DIR
+  CoreDDS_LIBRARY
 )
