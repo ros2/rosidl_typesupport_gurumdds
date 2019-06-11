@@ -574,7 +574,7 @@ _@(message.structure.namespaced_type.name)__serialize(const void * untyped_dds_m
   void * temp_message = nullptr;
   size_t message_size = 0;
 
-  temp_message = @(__dds_msg_type_prefix)_TypeSupport_serialize(dds_message, &message_size);
+  temp_message = @(__dds_msg_type_prefix)_TypeSupport_serialize(dds_message, &message_size, true);
   if (temp_message == nullptr || message_size == 0) {
     return false;
   }
@@ -598,7 +598,7 @@ _@(message.structure.namespaced_type.name)__deserialize(const rcutils_uint8_arra
   void * temp_message = nullptr;
   size_t message_size = serialized_message->buffer_length;
 
-  temp_message = @(__dds_msg_type_prefix)_TypeSupport_deserialize(serialized_message->buffer, message_size);
+  temp_message = @(__dds_msg_type_prefix)_TypeSupport_deserialize(serialized_message->buffer, message_size, true);
   if (temp_message == nullptr) {
     return false;
   }
