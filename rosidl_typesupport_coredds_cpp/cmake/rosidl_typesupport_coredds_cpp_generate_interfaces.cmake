@@ -147,7 +147,7 @@ configure_file(
 
 set(_target_suffix "__rosidl_typesupport_coredds_cpp")
 
-link_directories(${coredds_LIBRARY_DIRS})
+link_directories(${coredds_LIBRARY_DIR})
 add_library(${rosidl_generate_interfaces_TARGET}${_target_suffix} SHARED
   ${_generated_files} ${_generated_external_files})
 if(rosidl_generate_interfaces_LIBRARY_NAME)
