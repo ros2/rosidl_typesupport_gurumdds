@@ -421,7 +421,7 @@ serialize__@(spec.base_type.type)(const void* untyped_dds_message, rcutils_uint8
   void* temp_message = nullptr;
   size_t message_size = 0;
 
-  temp_message = @(spec.base_type.pkg_name)_@(subfolder)_dds__@(spec.base_type.type)_TypeSupport_serialize(dds_message, &message_size, true);
+  temp_message = @(spec.base_type.pkg_name)_@(subfolder)_dds__@(spec.base_type.type)_TypeSupport_serialize(dds_message, &message_size);
   if (temp_message == nullptr || message_size == 0) 
     return false;
 
@@ -444,7 +444,7 @@ deserialize__@(spec.base_type.type)(const rcutils_uint8_array_t* serialized_mess
   void* temp_message = nullptr;
   size_t message_size = serialized_message->buffer_length;
 
-  temp_message = @(spec.base_type.pkg_name)_@(subfolder)_dds__@(spec.base_type.type)_TypeSupport_deserialize(serialized_message->buffer, message_size, true);
+  temp_message = @(spec.base_type.pkg_name)_@(subfolder)_dds__@(spec.base_type.type)_TypeSupport_deserialize(serialized_message->buffer, message_size);
   if (temp_message == nullptr)
     return false;
 
