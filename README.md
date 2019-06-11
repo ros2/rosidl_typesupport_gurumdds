@@ -35,6 +35,11 @@ coredds
 ### rosidl_typesupport_coredds_c and rosidl_typesupport_coredds_cpp
 `rosidl_typesupport_coredds_c` and `rosidl_typesupport_coredds_cpp` generate C and C++ interfaces using CoreIDL, the preprocessor. These interfaces are used by `rmw_coredds`. For more information, see README.md of the [project](https://github.com/gurumnet/rmw_coredds)
 
+## Branches
+There are three branches in this project: master, dashing, and crystal.  
+New changes made in [ROS2 repository](https://github.com/ros2) will be applied to the mater branch, so this branch might be unstable.
+If you want to use this project with ROS2 Dashing Diademata or Crystal Clemmys, please use dashing or crystal branch.
+
 ## Implementation Status
 Currently some features are not fully implemented.
 - WString: `rosidl_typesupport_coredds` converts wstring to string using `std::wstring_convert` so communicating with another rmw implementation may not work as intended.
