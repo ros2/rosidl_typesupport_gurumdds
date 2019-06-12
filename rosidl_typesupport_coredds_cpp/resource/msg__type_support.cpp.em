@@ -134,12 +134,10 @@ else:
 @[    if field.type.array_size and not field.type.is_upper_bound]@
     for (size_t i = 0; i < len; i++) {
 @[      if field.type.type == 'string']@
-      free(dds_message.@(field.name)_);
       dds_message.@(field.name)_[i] = strdup(ros_message.@(field.name)[i].c_str());
 @[      elif field.type.is_primitive_type()]@
       dds_message.@(field.name)_[i] = ros_message.@(field.name)[i];
 @[      else]@
-      //dds_message.@(field.name)_[i] = (@(field.type.pkg_name)_msg_dds__@(field.type.type)_*)calloc(1, sizeof(@(field.type.pkg_name)_msg_dds__@(field.type.type)_));
       @(field.type.pkg_name)::msg::typesupport_coredds_cpp::alloc(dds_message.@(field.name)_[i]);
       if (!@(field.type.pkg_name)::msg::typesupport_coredds_cpp::ros_to_dds(ros_message.@(field.name)[i], *dds_message.@(field.name)_[i])) {
         return false;
@@ -184,8 +182,6 @@ else:
       }
     }
     for (size_t i = 0; i < len; i++) {
-      //@(field.type.pkg_name)_msg_dds__@(field.type.type)_* tmp = 
-      //  (@(field.type.pkg_name)_msg_dds__@(field.type.type)_*)calloc(1, sizeof(@(field.type.pkg_name)_msg_dds__@(field.type.type)_));
       @(field.type.pkg_name)_msg_dds__@(field.type.type)_ * tmp = nullptr;
       @(field.type.pkg_name)::msg::typesupport_coredds_cpp::alloc(tmp);
       if (!@(field.type.pkg_name)::msg::typesupport_coredds_cpp::ros_to_dds(ros_message.@(field.name)[i], *tmp))
@@ -195,7 +191,6 @@ else:
 @[    end if]@
 @[  else]@
 @[    if field.type.type == 'string']@
-    free(dds_message.@(field.name)_);
     dds_message.@(field.name)_ = strdup(ros_message.@(field.name).c_str());
 @[    elif field.type.is_primitive_type()]@
     dds_message.@(field.name)_ = ros_message.@(field.name);
@@ -358,7 +353,7 @@ free__@(spec.base_type.type)(void* data) {
 
 void
 set_sequence_number__@(spec.base_type.type)(void* untyped_dds_message, int64_t seq_number) {
-@[if subfolder == 'srv']@
+@[if subfolder == 'srv' or (subfolder == 'action' and (spec.base_type.type.endswith('Request') or spec.base_type.type.endswith('Response')))]@
   @(spec.base_type.pkg_name)_@(subfolder)_dds__@(spec.base_type.type)_* dds_message = 
     (@(spec.base_type.pkg_name)_@(subfolder)_dds__@(spec.base_type.type)_*) untyped_dds_message;
 
@@ -372,7 +367,7 @@ set_sequence_number__@(spec.base_type.type)(void* untyped_dds_message, int64_t s
 
 int64_t
 get_sequence_number__@(spec.base_type.type)(const void* untyped_dds_message) {
-@[if subfolder == 'srv']@
+@[if subfolder == 'srv' or (subfolder == 'action' and (spec.base_type.type.endswith('Request') or spec.base_type.type.endswith('Response')))]@
   const @(spec.base_type.pkg_name)_@(subfolder)_dds__@(spec.base_type.type)_* dds_message = 
     (const @(spec.base_type.pkg_name)_@(subfolder)_dds__@(spec.base_type.type)_*) untyped_dds_message;
 
@@ -385,7 +380,7 @@ get_sequence_number__@(spec.base_type.type)(const void* untyped_dds_message) {
 
 void
 set_guid__@(spec.base_type.type)(void* untyped_dds_message, const int8_t* guid) {
-@[if subfolder == 'srv']@
+@[if subfolder == 'srv' or (subfolder == 'action' and (spec.base_type.type.endswith('Request') or spec.base_type.type.endswith('Response')))]@
   @(spec.base_type.pkg_name)_@(subfolder)_dds__@(spec.base_type.type)_* dds_message = 
     (@(spec.base_type.pkg_name)_@(subfolder)_dds__@(spec.base_type.type)_*) untyped_dds_message;
 
@@ -400,7 +395,7 @@ set_guid__@(spec.base_type.type)(void* untyped_dds_message, const int8_t* guid) 
 
 void
 get_guid__@(spec.base_type.type)(const void* untyped_dds_message, int8_t* guid) {
-@[if subfolder == 'srv']@
+@[if subfolder == 'srv' or (subfolder == 'action' and (spec.base_type.type.endswith('Request') or spec.base_type.type.endswith('Response')))]@
   @(spec.base_type.pkg_name)_@(subfolder)_dds__@(spec.base_type.type)_* dds_message = 
     (@(spec.base_type.pkg_name)_@(subfolder)_dds__@(spec.base_type.type)_*) untyped_dds_message;
 

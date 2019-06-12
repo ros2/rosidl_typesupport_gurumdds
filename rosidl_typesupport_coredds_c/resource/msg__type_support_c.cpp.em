@@ -211,7 +211,6 @@ else:
         return false;
       }
 
-      free(dds_message->@(field.name)_[i]);
       dds_message->@(field.name)_[i] = strdup(str->data);
 @[      elif field.type.is_primitive_type()]@
       dds_message->@(field.name)_[i] = ros_i;
@@ -465,7 +464,7 @@ __free(void* data) {
 
 static void
 __set_sequence_number(void* untyped_dds_message, int64_t seq_number) {
-@[if subfolder == 'srv']@
+@[if subfolder == 'srv' or (subfolder == 'action' and (spec.base_type.type.endswith('Request') or spec.base_type.type.endswith('Response')))]@
   @(spec.base_type.pkg_name)_@(subfolder)_dds__@(spec.base_type.type)_* dds_message = 
     (@(spec.base_type.pkg_name)_@(subfolder)_dds__@(spec.base_type.type)_*) untyped_dds_message;
 
@@ -479,7 +478,7 @@ __set_sequence_number(void* untyped_dds_message, int64_t seq_number) {
 
 static int64_t
 __get_sequence_number(const void* untyped_dds_message) {
-@[if subfolder == 'srv']@
+@[if subfolder == 'srv' or (subfolder == 'action' and (spec.base_type.type.endswith('Request') or spec.base_type.type.endswith('Response')))]@
   const @(spec.base_type.pkg_name)_@(subfolder)_dds__@(spec.base_type.type)_* dds_message = 
     (const @(spec.base_type.pkg_name)_@(subfolder)_dds__@(spec.base_type.type)_*) untyped_dds_message;
 
@@ -492,7 +491,7 @@ __get_sequence_number(const void* untyped_dds_message) {
 
 static void
 __set_guid(void* untyped_dds_message, const int8_t* guid) {
-@[if subfolder == 'srv']@
+@[if subfolder == 'srv' or (subfolder == 'action' and (spec.base_type.type.endswith('Request') or spec.base_type.type.endswith('Response')))]@
   @(spec.base_type.pkg_name)_@(subfolder)_dds__@(spec.base_type.type)_* dds_message = 
     (@(spec.base_type.pkg_name)_@(subfolder)_dds__@(spec.base_type.type)_*) untyped_dds_message;
 
@@ -507,7 +506,7 @@ __set_guid(void* untyped_dds_message, const int8_t* guid) {
 
 static void
 __get_guid(const void* untyped_dds_message, int8_t* guid) {
-@[if subfolder == 'srv']@
+@[if subfolder == 'srv' or (subfolder == 'action' and (spec.base_type.type.endswith('Request') or spec.base_type.type.endswith('Response')))]@
   @(spec.base_type.pkg_name)_@(subfolder)_dds__@(spec.base_type.type)_* dds_message = 
     (@(spec.base_type.pkg_name)_@(subfolder)_dds__@(spec.base_type.type)_*) untyped_dds_message;
 

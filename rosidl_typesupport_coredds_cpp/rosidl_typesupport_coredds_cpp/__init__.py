@@ -68,8 +68,9 @@ def generate_dds_coredds_cpp(
         except FileExistsError:
             pass
 
-        _modify(idl_file, pkg_name, os.path.splitext(os.path.basename(idl_file))[0],
-                (str(os.path.basename(parent_folder)) == 'srv'))
+        _modify(
+            idl_file, pkg_name, os.path.splitext(os.path.basename(idl_file))[0],
+            (str(os.path.basename(parent_folder)) == 'srv' or str(os.path.basename(parent_folder)) == 'action'))
 
         cmd = [idl_pp]
         for include_dir in include_dirs:
@@ -129,10 +130,13 @@ def _modify(filename, pkg_name, msg_name, is_srv):
 
 
 def add_seq_number(lines):
+    flag = False
     for i, line in enumerate(lines):
         if line.startswith('  long long coredds__sequence_number_;'):
             break
-        if line.startswith('};'):
+        if line.endswith('Request_') or line.endswith('Response_'):
+            flag = True
+        if line.startswith('};') and flag is True:
             assert i >= 2, 'unexpected end of struct declaration'
             lines.insert(i - 1, '  long long coredds__sequence_number_;')
             lines.insert(i, '  unsigned long long coredds__client_guid_0_;')
