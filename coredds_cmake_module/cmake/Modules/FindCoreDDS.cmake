@@ -85,7 +85,7 @@ if(NOT _COREDDS_HOME STREQUAL "")
       endif()
     endif()
     set(CoreDDS_LIBRARY "${CoreDDS_LIBRARY_DIR}${os_dir}libdds.so")
-  
+
     file(GLOB library "${CoreDDS_LIBRARY}")
     if(library)
       set(CoreDDS_FOUND TRUE)
