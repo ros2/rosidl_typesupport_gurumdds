@@ -51,7 +51,8 @@ def generate_dds_coredds_cpp(
 
         _modify(
             idl_file, pkg_name, os.path.splitext(os.path.basename(idl_file))[0],
-            (str(os.path.basename(parent_folder)) == 'srv' or str(os.path.basename(parent_folder)) == 'action'))
+            (str(os.path.basename(parent_folder)) == 'srv' or
+                str(os.path.basename(parent_folder)) == 'action'))
 
         cmd = [idl_pp]
         for include_dir in include_dirs:
@@ -131,13 +132,13 @@ def _modify(filename, pkg_name, msg_name, is_srv):
 
 
 def add_seq_number(lines):
-
     changed = True
     while changed:
         changed = False
         flag = False
         for i, line in enumerate(lines):
-            if line.startswith('struct') and (line.endswith('_Request_ {') or line.endswith('_Response_ {')):
+            if (line.startswith('struct') and
+                    (line.endswith('_Request_ {') or line.endswith('_Response_ {'))):
                 if flag:
                     assert False, 'unexpected struct declaration'
                 flag = True
