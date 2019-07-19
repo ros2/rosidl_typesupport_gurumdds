@@ -22,6 +22,7 @@ header_files = [
     include_base + '/' + c_include_prefix + '__rosidl_typesupport_coredds_c.h',
     'rcutils/types/uint8_array.h',
     'rosidl_typesupport_coredds_c/identifier.h',
+    'rosidl_typesupport_coredds_c/wstring_conversion.hpp',
     'rosidl_typesupport_coredds_cpp/message_type_support.h',
     package_name + '/msg/rosidl_typesupport_coredds_c__visibility_control.h',
     include_base + '/' + c_include_prefix + '__struct.h',
@@ -214,7 +215,7 @@ if isinstance(type_, AbstractNestedType):
 if isinstance(type_, AbstractString):
   seq_name = 'String'
 elif isinstance(type_, AbstractWString):
-  seq_name = 'String'
+  seq_name = 'Wstring'
 elif isinstance(type_, BasicType):
   if type_.typename == 'boolean':
     seq_name = 'Boolean'
@@ -284,8 +285,19 @@ else:
       dds_message->@(member.name)_[i] = strdup(str->data);
 @[      elif isinstance(type_, AbstractWString)]@
       const rosidl_generator_c__U16String * str = &ros_message->@(member.name)[i];
-      std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t> cv;
-      dds_message->@(member.name)_[i] = strdup(cv.to_bytes(reinterpret_cast<const char16_t *>(str->data)).c_str());
+      if (str->capacity == 0 || str->capacity <= str->size) {
+        fprintf(stderr, "string capacity not greater than size\n");
+        return false;
+      }
+      if (str->data[str->size] != u'\0') {
+        fprintf(stderr, "string not null-terminated\n");
+        return false;
+      }
+      dds_message->@(member.name)_[i] = rosidl_typesupport_coredds_c::create_wstring_from_u16string(*str);
+      if (dds_message->@(member.name)_[i] == NULL) {
+        fprintf(stderr, "failed to convert u16string to dds_Wstring\n");
+        return false;
+      }
 @[      elif isinstance(type_, BasicType)]@
 @[        if type_.typename == 'boolean']@
       dds_message->@(member.name)_[i] = static_cast<dds_@(seq_name)>(ros_message->@(member.name)[i] ? 1 : 0);
@@ -326,8 +338,21 @@ else:
       dds_StringSeq_add(dds_message->@(member.name)_, strdup(str->data));
 @[        elif isinstance(type_, AbstractWString)]@
       const rosidl_generator_c__U16String * str = &ros_message->@(member.name).data[i];
-      std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t> cv;
-      dds_StringSeq_add(dds_message->@(member.name)_, strdup(cv.to_bytes(reinterpret_cast<const char16_t *>(str->data)).c_str()));
+      if (str->capacity == 0 || str->capacity <= str->size) {
+        fprintf(stderr, "string capacity not greater than size\n");
+        return false;
+      }
+      if (str->data[str->size] != '\0') {
+        fprintf(stderr, "string not null-terminated\n");
+        return false;
+      }
+
+      dds_Wstring temp_wstring = rosidl_typesupport_coredds_c::create_wstring_from_u16string(*str);
+      if (temp_wstring == NULL) {
+        fprintf(stderr, "failed to convert u16string to dds_Wstring\n");
+        return false;
+      }
+      dds_WstringSeq_add(dds_message->@(member.name)_, temp_wstring);
 @[        else]@
       @(__dds_msg_type) * dds_i = reinterpret_cast<@(__dds_msg_type) *>(@(idl_structure_type_to_c_typename(type_))__callbacks->alloc());
       if (!@(idl_structure_type_to_c_typename(type_))__callbacks->convert_ros_to_dds(&ros_message->@(member.name).data[i], dds_i)) {
@@ -354,8 +379,20 @@ else:
     dds_message->@(member.name)_ = strdup(str->data);
 @[  elif isinstance(member.type, AbstractWString)]@
     const rosidl_generator_c__U16String * str = &ros_message->@(member.name);
-    std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t> cv;
-    dds_message->@(member.name)_ = strdup(cv.to_bytes(reinterpret_cast<const char16_t *>(str->data)).c_str());
+    if (str->capacity == 0 || str->capacity <= str->size) {
+      fprintf(stderr, "string capacity not greater than size\n");
+      return false;
+    }
+    if (str->data[str->size] != '\0') {
+      fprintf(stderr, "string not null-terminated\n");
+      return false;
+    }
+
+    dds_message->@(member.name)_ = rosidl_typesupport_coredds_c::create_wstring_from_u16string(*str);
+    if (dds_message->@(member.name)_ == NULL) {
+      fprintf(stderr, "failed to convert u16string to dds_Wstring\n");
+      return false;
+    }
 @[  elif isinstance(member.type, BasicType)]@
 @[    if type_.typename == 'boolean']@
     dds_message->@(member.name)_ = static_cast<dds_@(seq_name)>(ros_message->@(member.name) ? 1 : 0);
@@ -408,7 +445,7 @@ if isinstance(type_, AbstractNestedType):
 if isinstance(type_, AbstractString):
   seq_name = 'String'
 elif isinstance(type_, AbstractWString):
-  seq_name = 'String'
+  seq_name = 'Wstring'
 elif isinstance(type_, BasicType):
   if type_.typename == 'boolean':
     seq_name = 'Boolean'
@@ -484,15 +521,9 @@ else:
       if (!ros_i.data) {
         rosidl_generator_c__U16String__init(&ros_i);
       }
-      std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t> cv;
-      std::u16string str = cv.from_bytes(std::string(dds_i));
-
-      bool succeeded = rosidl_generator_c__U16String__assignn(
-        &ros_i, reinterpret_cast<
-          std::add_pointer<std::add_const<std::remove_pointer<decltype(ros_i.data)>::type>::type>::type
-        >(str.c_str()), str.size());
-      if (!succeeded) {
-        return "failed to assign string into field '@(member.name)'";
+      if (!rosidl_typesupport_coredds_c::convert_wstring_to_u16string(dds_i, ros_i)) {
+        fprintf(stderr, "failed to convert dds_Wstring to u16string\n");
+        return false;
       }
 @[      elif isinstance(type_, NamespacedType)]@
       const rosidl_message_type_support_t * ts =
@@ -516,15 +547,9 @@ else:
     if (!ros_message->@(member.name).data) {
       rosidl_generator_c__U16String__init(&ros_message->@(member.name));
     }
-    std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t> cv;
-    std::u16string str = cv.from_bytes(std::string(dds_message->@(member.name)_));
-
-    bool succeeded = rosidl_generator_c__U16String__assignn(
-      &ros_message->@(member.name), reinterpret_cast<
-        std::add_pointer<std::add_const<std::remove_pointer<decltype(ros_message->@(member.name).data)>::type>::type>::type
-      >(str.c_str()), str.size());
-    if (!succeeded) {
-      return "failed to assign string into field '@(member.name)'";
+    if (!rosidl_typesupport_coredds_c::convert_wstring_to_u16string(dds_message->@(member.name)_, ros_message->@(member.name))) {
+      fprintf(stderr, "failed to convert dds_Wstring to u16string\n");
+      return false;
     }
 @[  elif isinstance(member.type, BasicType)]@
 @[    if member.type.typename == 'bool']@

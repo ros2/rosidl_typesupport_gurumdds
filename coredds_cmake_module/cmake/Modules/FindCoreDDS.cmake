@@ -25,8 +25,8 @@
 #
 # - CoreDDS_FOUND: flag indicating if the package was found
 # - CoreDDS_INCLUDE_DIR: Paths to the header files
-# - CoreDDS_LIBRARIES: Name to the C++ libraries including the path
-# - CoreDDS_LIBRARY_DIRS: Paths to the library
+# - CoreDDS_LIBRARIES: Name to the C++ library including the path
+# - CoreDDS_LIBRARY_DIRS: Path to the library
 # - CoreDDS_COREIDL: Path to the idl2code generator
 #
 # Example usage:
@@ -84,7 +84,7 @@ if(NOT _COREDDS_HOME STREQUAL "")
         endif()
       endif()
     endif()
-	set(CoreDDS_LIBRARY_DIRS "${CoreDDS_LIBRARY_DIRS}${os_dir}")
+    set(CoreDDS_LIBRARY_DIRS "${CoreDDS_LIBRARY_DIRS}${os_dir}")
     set(CoreDDS_LIBRARIES "${CoreDDS_LIBRARY_DIRS}libdds.so")
 
     file(GLOB library "${CoreDDS_LIBRARIES}")
