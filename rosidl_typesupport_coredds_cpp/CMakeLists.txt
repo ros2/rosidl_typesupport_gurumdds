@@ -41,7 +41,8 @@ link_directories(${CoreDDS_LIBRARY_DIR})
 ament_python_install_package(${PROJECT_NAME})
 
 add_library(${PROJECT_NAME} SHARED
-  src/identifier.cpp)
+  src/identifier.cpp
+  src/wstring_conversion.cpp)
 if(WIN32)
   target_compile_definitions(${PROJECT_NAME} PRIVATE "ROSIDL_TYPESUPPORT_COREDDS_CPP_BUILDING_DLL")
 endif()

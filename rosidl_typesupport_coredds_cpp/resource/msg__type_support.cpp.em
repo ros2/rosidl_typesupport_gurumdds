@@ -21,6 +21,7 @@ header_files = [
     'rosidl_typesupport_coredds_cpp/identifier.hpp',
     'rosidl_typesupport_coredds_cpp/message_type_support.h',
     'rosidl_typesupport_coredds_cpp/message_type_support_decl.hpp',
+    'rosidl_typesupport_coredds_cpp/wstring_conversion.hpp',
 ]
 }@
 @[for header_file in header_files]@
@@ -120,7 +121,7 @@ if isinstance(type_, AbstractNestedType):
 if isinstance(type_, AbstractString):
   seq_name = 'String'
 elif isinstance(type_, AbstractWString):
-  seq_name = 'String'
+  seq_name = 'Wstring'
 elif isinstance(type_, BasicType):
   if type_.typename == 'boolean':
     seq_name = 'Boolean'
@@ -128,6 +129,8 @@ elif isinstance(type_, BasicType):
     seq_name = 'Octet'
   elif type_.typename == 'char':
     seq_name = 'Char'
+  elif type_.typename == 'wchar':
+    seq_name = 'Wchar'
   elif type_.typename == 'float32' or type_.typename == 'float':
     seq_name = 'Float'
   elif type_.typename == 'float64' or type_.typename == 'double':
@@ -173,9 +176,11 @@ else:
       free(dds_message.@(member.name)_[i]);
       dds_message.@(member.name)_[i] = strdup(ros_message.@(member.name)[i].c_str());
 @[      elif isinstance(member.type.value_type, AbstractWString)]@
-      std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t> cv;
-      free(dds_message.@(member.name)_[i]);
-      dds_message.@(member.name)_[i] = strdup(cv.to_bytes(ros_message.@(member.name)[i].c_str()).c_str());
+      dds_message.@(member.name)_[i] = rosidl_typesupport_coredds_cpp::create_wstring_from_u16string(ros_message.@(member.name)[i]);
+      if (dds_message.@(member.name)_[i] == NULL) {
+        fprintf(stderr, "failed to convert u16string to dds_Wstring\n");
+        return false;
+      }
 @[      elif isinstance(member.type.value_type, BasicType)]@
       dds_message.@(member.name)_[i] = ros_message.@(member.name)[i];
 @[      elif isinstance(member.type.value_type, NamespacedType)]@
@@ -198,16 +203,20 @@ else:
       dds_StringSeq_add(dds_message.@(member.name)_, strdup(ros_message.@(member.name)[i].c_str()));
     }
 @[    elif isinstance(member.type.value_type, AbstractWString)]@
-    std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t> cv;
     if (dds_message.@(member.name)_ == NULL) {
-      dds_message.@(member.name)_ = dds_StringSeq_create(8);
+      dds_message.@(member.name)_ = dds_WstringSeq_create(8);
       if (dds_message.@(member.name)_ == NULL) {
         return false;
       }
     }
 
     for (size_t i = 0; i < size; i++) {
-      dds_StringSeq_add(dds_message.@(member.name)_, strdup(cv.to_bytes(ros_message.@(member.name)[i].c_str()).c_str()));
+      dds_Wstring temp_wstring = rosidl_typesupport_coredds_cpp::create_wstring_from_u16string(ros_message.@(member.name)[i]);
+      if (temp_wstring == NULL) {
+        fprintf(stderr, "failed to convert u16string to dds_Wstring\n");
+        return false;
+      }
+      dds_WstringSeq_add(dds_message.@(member.name)_, temp_wstring);
     }
 @[    elif isinstance(member.type.value_type, BasicType)]@
 @[      if member.type.value_type.typename == 'boolean']@
@@ -252,9 +261,11 @@ else:
     free(dds_message.@(member.name)_);
     dds_message.@(member.name)_ = strdup(ros_message.@(member.name).c_str());
 @[    elif isinstance(member.type, AbstractWString)]@
-    std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t> cv;
-    free(dds_message.@(member.name)_);
-    dds_message.@(member.name)_ = strdup(cv.to_bytes(ros_message.@(member.name).c_str()).c_str());
+    dds_message.@(member.name)_ = rosidl_typesupport_coredds_cpp::create_wstring_from_u16string(ros_message.@(member.name));
+    if (dds_message.@(member.name)_ == NULL) {
+      fprintf(stderr, "failed to convert u16string to dds_Wstring\n");
+      return false;
+    }
 @[    elif isinstance(member.type, BasicType)]@
     dds_message.@(member.name)_ = ros_message.@(member.name);
 @[    elif isinstance(member.type, NamespacedType)]@
@@ -308,7 +319,7 @@ if isinstance(type_, AbstractNestedType):
 if isinstance(type_, AbstractString):
   seq_name = 'String'
 elif isinstance(type_, AbstractWString):
-  seq_name = 'String'
+  seq_name = 'Wstring'
 elif isinstance(type_, BasicType):
   if type_.typename == 'boolean':
     seq_name = 'Boolean'
@@ -316,6 +327,8 @@ elif isinstance(type_, BasicType):
     seq_name = 'Octet'
   elif type_.typename == 'char':
     seq_name = 'Char'
+  elif type_.typename == 'wchar':
+    seq_name = 'Wchar'
   elif type_.typename == 'float32' or type_.typename == 'float':
     seq_name = 'Float'
   elif type_.typename == 'float64' or type_.typename == 'double':
@@ -353,8 +366,10 @@ else:
 @[      if isinstance(member.type.value_type, AbstractString)]@
       ros_message.@(member.name)[i] = std::string(dds_message.@(member.name)_[i]);
 @[      elif isinstance(member.type.value_type, AbstractWString)]@
-      std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t> cv;
-      ros_message.@(member.name)[i] = cv.from_bytes(dds_message.@(member.name)_[i]);
+      if (!rosidl_typesupport_coredds_cpp::convert_wstring_to_u16string(dds_message.@(member.name)_[i], ros_message.@(member.name)[i])) {
+        fprintf(stderr, "failed to convert dds_Wstring to u16string\n");
+        return false;
+      }
 @[      elif isinstance(member.type.value_type, BasicType)]@
       ros_message.@(member.name)[i] = dds_message.@(member.name)_[i];
 @[      elif isinstance(member.type.value_type, NamespacedType)]@
@@ -370,9 +385,12 @@ else:
       ros_message.@(member.name)[i] = std::string(dds_StringSeq_get(dds_message.@(member.name)_, i));
     }
 @[    elif isinstance(member.type.value_type, AbstractWString)]@
-    std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t> cv;
     for (uint32_t i = 0; i < size; i++) {
-      ros_message.@(member.name)[i] = cv.from_bytes(dds_StringSeq_get(dds_message.@(member.name)_, i));
+      dds_Wstring temp_wstring = dds_WstringSeq_get(dds_message.@(member.name)_, i);
+      if (!rosidl_typesupport_coredds_cpp::convert_wstring_to_u16string(temp_wstring, ros_message.@(member.name)[i])) {
+        fprintf(stderr, "failed to convert dds_Wstring to u16string\n");
+        return false;
+      }
     }
 @[    elif isinstance(member.type.value_type, BasicType)]@
 @[      if member.type.value_type.typename == 'boolean']@
@@ -398,8 +416,10 @@ else:
 @[    if isinstance(member.type, AbstractString)]@
     ros_message.@(member.name) = std::string(dds_message.@(member.name)_);
 @[    elif isinstance(member.type, AbstractWString)]@
-    std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t> cv;
-    ros_message.@(member.name) = cv.from_bytes(std::string(dds_message.@(member.name)_));
+    if (!rosidl_typesupport_coredds_cpp::convert_wstring_to_u16string(dds_message.@(member.name)_, ros_message.@(member.name))) {
+      fprintf(stderr, "failed to convert dds_Wstring to u16string\n");
+      return false;
+    }
 @[    elif isinstance(member.type, BasicType)]@
     ros_message.@(member.name) = dds_message.@(member.name)_;
 @[    else]@
