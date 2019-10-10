@@ -32,7 +32,7 @@ else
   _COREDDS_HOME_TO_USE=$COREDDS_HOME
 fi
 
-ament_prepend_unique_value PATH "$_COREDDS_HOME_TO_USE/tool"
+export COREDDS_HOME="$_COREDDS_HOME_TO_USE"
 
 # detect if running on Darwin platform
 _UNAME=`uname -s`
@@ -42,16 +42,37 @@ if [ "$_UNAME" = "Darwin" ]; then
 fi
 unset _UNAME
 
-# add the library dir on the (DY)LD_LIBRARY_PATH for the CoreIDL tool
-ament_prepend_unique_value PATH "$_COREDDS_HOME_TO_USE/lib"
 if [ $_IS_DARWIN -eq 0 ]; then
-  ament_prepend_unique_value LD_LIBRARY_PATH "$_COREDDS_HOME_TO_USE/lib"
+  _LIB_PATH=LD_LIBRARY_PATH
 else
-  ament_prepend_unique_value DYLD_LIBRARY_PATH "$_COREDDS_HOME_TO_USE/lib"
+  _LIB_PATH=DYLD_LIBRARY_PATH
 fi
-unset _IS_DARWIN
 
-export COREDDS_HOME="$_COREDDS_HOME_TO_USE"
+eval _PATHS=\"\$$_LIB_PATH\"
+if [ -z "$_PATHS" ]; then
+  eval export $_LIB_PATH=\"$COREDDS_HOME/lib\"
+else
+  _IFS_SAVE=$IFS
+  IFS=':'
+  if [ "$AMENT_SHELL" = "zsh" ]; then
+    ament_zsh_to_array _PATHS
+  fi
+  for _PATH in $_PATHS; do
+    if [ -n "$_PATH" -a "$_PATH" = "$COREDDS_HOME/lib" ]; then
+      _FLAG=1
+    fi
+  done
+  if [ -z "$_FLAG" ]; then
+    eval export $_LIB_PATH=\"$COREDDS_HOME/lib:\$$_LIB_PATH\"
+  fi
+  IFS=$_IFS_SAVE
+  unset _IFS_SAVE
+  unset _FLAG
+fi
+unset _PATHS
+
+unset _LIB_PATH
+unset _IS_DARWIN
 
 unset _COREDDS_HOME_TO_USE
 unset _BUILDTIME_COREDDS_HOME
