@@ -2,7 +2,7 @@
 Typesupport package which generates interfaces used by `rmw_coredds`.
 
 ## Requirements
-This project requires CoreDDS to be built. You can get trial version of CoreDDS [here](http://www.gurum.cc/coredds/trial).
+This project requires CoreDDS to be built. You can get trial version of CoreDDS [here](http://www.gurum.cc/?page_id=2150).
 To use this, extract the archive to `~/coredds` or any directory you want. After that, move your `coredds.lic` file to where you extracted the archive and set the environment variable `COREDDS_LICENSE_PATH` to your `coredds.lic` file. For example, if you extracted the archive to `~/coredds`, it should be `COREDDS_LICENSE_FILE=~/coredds/coredds.lic`.
 
 ## Packages
