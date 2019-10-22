@@ -270,8 +270,12 @@ else:
 @[      end if]@
 @[    end if]@
 @[    if isinstance(member.type, Array)]@
+@[      if isinstance(type_, BasicType)]@
+    (void)size;
+    memcpy(dds_message->@(member.name)_, ros_message->@(member.name), sizeof(dds_message->@(member.name)_));
+@[      else]@
     for (uint32_t i = 0; i < static_cast<uint32_t>(size); ++i) {
-@[      if isinstance(type_, AbstractString)]@
+@[        if isinstance(type_, AbstractString)]@
       const rosidl_generator_c__String * str = &ros_message->@(member.name)[i];
       if (str->capacity == 0 || str->capacity <= str->size) {
         fprintf(stderr, "string capacity not greater than size\n");
@@ -283,7 +287,7 @@ else:
       }
 
       dds_message->@(member.name)_[i] = strdup(str->data);
-@[      elif isinstance(type_, AbstractWString)]@
+@[        elif isinstance(type_, AbstractWString)]@
       const rosidl_generator_c__U16String * str = &ros_message->@(member.name)[i];
       if (str->capacity == 0 || str->capacity <= str->size) {
         fprintf(stderr, "string capacity not greater than size\n");
@@ -298,19 +302,14 @@ else:
         fprintf(stderr, "failed to convert u16string to dds_Wstring\n");
         return false;
       }
-@[      elif isinstance(type_, BasicType)]@
-@[        if type_.typename == 'boolean']@
-      dds_message->@(member.name)_[i] = static_cast<dds_@(seq_name)>(ros_message->@(member.name)[i] ? 1 : 0);
 @[        else]@
-      dds_message->@(member.name)_[i] = static_cast<dds_@(seq_name)>(ros_message->@(member.name)[i]);
-@[        end if]@
-@[      else]@
       dds_message->@(member.name)_[i] = reinterpret_cast<@('_'.join(type_.namespaces + ['dds_', type_.name]))_ *>(@(idl_structure_type_to_c_typename(type_))__callbacks->alloc());
       if (!@(idl_structure_type_to_c_typename(type_))__callbacks->convert_ros_to_dds(&(ros_message->@(member.name)[i]), dds_message->@(member.name)_[i])) {
         return false;
       }
-@[      end if]@
+@[        end if]@
     }
+@[      end if]@
 @[    else]@
 @[      if isinstance(type_, BasicType)]@
     if (dds_message->@(member.name)_ == NULL) {
@@ -493,6 +492,9 @@ else:
 
 @[    if not isinstance(member.type, Array) and isinstance(type_, BasicType)]@
     dds_@(seq_name)Seq_get_array(dds_message->@(member.name)_, reinterpret_cast<dds_@(seq_name) *>(ros_message->@(member.name).data), 0, size);
+@[    elif isinstance(member.type, Array) and isinstance(type_, BasicType)]@
+    (void)size;
+    memcpy(ros_message->@(member.name), dds_message->@(member.name)_, sizeof(dds_message->@(member.name)_));
 @[    else]@
     for (uint32_t i = 0; i < size; i++) {
 @[      if isinstance(member.type, Array)]@

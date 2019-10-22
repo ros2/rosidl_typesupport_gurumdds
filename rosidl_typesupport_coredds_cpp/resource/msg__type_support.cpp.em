@@ -171,27 +171,30 @@ else:
 @[    end if]@
 
 @[    if isinstance(member.type, Array)]@
+@[      if isinstance(member.type.value_type, BasicType)]@
+    (void)size;
+    memcpy(dds_message.@(member.name)_, ros_message.@(member.name).data(), sizeof(dds_message.@(member.name)_));
+@[      else]@
     for (size_t i = 0; i < size; i++) {
-@[      if isinstance(member.type.value_type, AbstractString)]@
+@[        if isinstance(member.type.value_type, AbstractString)]@
       free(dds_message.@(member.name)_[i]);
       dds_message.@(member.name)_[i] = strdup(ros_message.@(member.name)[i].c_str());
-@[      elif isinstance(member.type.value_type, AbstractWString)]@
+@[        elif isinstance(member.type.value_type, AbstractWString)]@
       dds_message.@(member.name)_[i] = rosidl_typesupport_coredds_cpp::create_wstring_from_u16string(ros_message.@(member.name)[i]);
       if (dds_message.@(member.name)_[i] == NULL) {
         fprintf(stderr, "failed to convert u16string to dds_Wstring\n");
         return false;
       }
-@[      elif isinstance(member.type.value_type, BasicType)]@
-      dds_message.@(member.name)_[i] = ros_message.@(member.name)[i];
-@[      elif isinstance(member.type.value_type, NamespacedType)]@
+@[        elif isinstance(member.type.value_type, NamespacedType)]@
       @('::'.join(member.type.value_type.namespaces))::typesupport_coredds_cpp::alloc(dds_message.@(member.name)_[i]);
       if (!@('::'.join(member.type.value_type.namespaces))::typesupport_coredds_cpp::ros_to_dds(ros_message.@(member.name)[i], *dds_message.@(member.name)_[i])) {
         return false;
       }
-@[      else]@
+@[        else]@
 @{        assert False, "unknown type %s" % type_}@
-@[      end if]@
+@[        end if]@
     }
+@[      end if]@
 @[    elif isinstance(member.type.value_type, AbstractString)]@
     if (dds_message.@(member.name)_ == NULL) {
       dds_message.@(member.name)_ = dds_StringSeq_create(8);
@@ -362,24 +365,29 @@ else:
 @[    end if]@
 
 @[    if isinstance(member.type, Array)]@
+@[      if isinstance(member.type.value_type, BasicType)]@
+    (void)size;
+    memcpy(ros_message.@(member.name).data(), dds_message.@(member.name)_, sizeof(dds_message.@(member.name)_));
+@[      else]@
     for (uint32_t i = 0; i < size; i++) {
-@[      if isinstance(member.type.value_type, AbstractString)]@
+@[        if isinstance(member.type.value_type, AbstractString)]@
       ros_message.@(member.name)[i] = std::string(dds_message.@(member.name)_[i]);
-@[      elif isinstance(member.type.value_type, AbstractWString)]@
+@[        elif isinstance(member.type.value_type, AbstractWString)]@
       if (!rosidl_typesupport_coredds_cpp::convert_wstring_to_u16string(dds_message.@(member.name)_[i], ros_message.@(member.name)[i])) {
         fprintf(stderr, "failed to convert dds_Wstring to u16string\n");
         return false;
       }
-@[      elif isinstance(member.type.value_type, BasicType)]@
+@[        elif isinstance(member.type.value_type, BasicType)]@
       ros_message.@(member.name)[i] = dds_message.@(member.name)_[i];
-@[      elif isinstance(member.type.value_type, NamespacedType)]@
+@[        elif isinstance(member.type.value_type, NamespacedType)]@
       if (!@('::'.join(member.type.value_type.namespaces))::typesupport_coredds_cpp::dds_to_ros(*dds_message.@(member.name)_[i], ros_message.@(member.name)[i])) {
         return false;
       }
-@[      else]@
+@[        else]@
 @{        assert False, "unknown type %s" % type_}@
-@[      end if]@
+@[        end if]@
     }
+@[      end if]@
 @[    elif isinstance(member.type.value_type, AbstractString)]@
     for (uint32_t i = 0; i < size; i++) {
       ros_message.@(member.name)[i] = std::string(dds_StringSeq_get(dds_message.@(member.name)_, i));
