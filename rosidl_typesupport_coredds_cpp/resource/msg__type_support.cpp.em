@@ -120,6 +120,7 @@ elif field.type.type == 'string':
 else:
   seq_name = 'Data'
 }@
+
 @[    if field.type.array_size and not field.type.is_upper_bound]@
     size_t len = @(field.type.array_size);
 @[    else]@
@@ -131,19 +132,25 @@ else:
       throw std::runtime_error("array size exceeds upper bound");
 @[      end if]@
 @[    end if]@
+
 @[    if field.type.array_size and not field.type.is_upper_bound]@
-    for (size_t i = 0; i < len; i++) {
-@[      if field.type.type == 'string']@
-      dds_message.@(field.name)_[i] = strdup(ros_message.@(field.name)[i].c_str());
-@[      elif field.type.is_primitive_type()]@
-      dds_message.@(field.name)_[i] = ros_message.@(field.name)[i];
+@[      if field.type.type != 'string' and field.type.is_primitive_type()]@
+    (void)len;
+    memcpy(dds_message.@(field.name)_, ros_message.@(field.name).data(), sizeof(dds_message.@(field.name)_));
 @[      else]@
+    for (size_t i = 0; i < len; i++) {
+@[        if field.type.type == 'string']@
+      dds_message.@(field.name)_[i] = strdup(ros_message.@(field.name)[i].c_str());
+@[        elif field.type.is_primitive_type()]@
+      dds_message.@(field.name)_[i] = ros_message.@(field.name)[i];
+@[        else]@
       @(field.type.pkg_name)::msg::typesupport_coredds_cpp::alloc(dds_message.@(field.name)_[i]);
       if (!@(field.type.pkg_name)::msg::typesupport_coredds_cpp::ros_to_dds(ros_message.@(field.name)[i], *dds_message.@(field.name)_[i])) {
         return false;
       }
-@[      end if]@
+@[        end if]@
     }
+@[      end if]@
 @[    elif field.type.type == 'string']@
     if (dds_message.@(field.name)_ == NULL) {
       dds_message.@(field.name)_ = dds_StringSeq_create(8);
@@ -269,17 +276,23 @@ else:
     size_t len = dds_DataSeq_length((dds_DataSeq*)dds_message.@(field.name)_);
     ros_message.@(field.name).resize(len);
 @[    end if]@
+
 @[    if field.type.array_size and not field.type.is_upper_bound]@
-    for (uint32_t i = 0; i < len; i++) {
-@[      if field.type.type == 'string']@
-      ros_message.@(field.name)[i] = std::string(dds_message.@(field.name)_[i]);
-@[      elif field.type.is_primitive_type()]@
-      ros_message.@(field.name)[i] = dds_message.@(field.name)_[i];
+@[      if field.type.type != 'string' and field.type.is_primitive_type()]@
+    (void)len;
+    memcpy(ros_message.@(field.name).data(), dds_message.@(field.name)_, sizeof(dds_message.@(field.name)_));
 @[      else]@
+    for (uint32_t i = 0; i < len; i++) {
+@[        if field.type.type == 'string']@
+      ros_message.@(field.name)[i] = std::string(dds_message.@(field.name)_[i]);
+@[        elif field.type.is_primitive_type()]@
+      ros_message.@(field.name)[i] = dds_message.@(field.name)_[i];
+@[        else]@
       if (!@(field.type.pkg_name)::msg::typesupport_coredds_cpp::dds_to_ros(*dds_message.@(field.name)_[i], ros_message.@(field.name)[i]))
         return false;
-@[      end if]@
+@[        end if]@
     }
+@[      end if]@
 @[    elif field.type.type == 'string']@
     for (uint32_t i = 0; i < len; i++) {
       ros_message.@(field.name)[i] = std::string(dds_StringSeq_get((dds_StringSeq*)dds_message.@(field.name)_, i));

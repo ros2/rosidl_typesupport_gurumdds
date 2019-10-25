@@ -198,9 +198,13 @@ else:
 @[    end if]@
 
 @[    if field.type.array_size and not field.type.is_upper_bound]@
+@[      if field.type.type != 'string' and field.type.is_primitive_type()]@
+    (void)len;
+    memcpy(dds_message->@(field.name)_, ros_message->@(field.name), sizeof(dds_message->@(field.name)_));
+@[      else]@
     for(uint32_t i = 0; i < static_cast<uint32_t>(len); ++i) {
       auto & ros_i = ros_message->@(field.name)[i];
-@[      if field.type.type == 'string']@
+@[        if field.type.type == 'string']@
       const rosidl_generator_c__String* str = &ros_i;
       if(str->capacity == 0 || str->capacity <= str->size) {
         fprintf(stderr, "string capacity not greater than size\n");
@@ -212,15 +216,15 @@ else:
       }
 
       dds_message->@(field.name)_[i] = strdup(str->data);
-@[      elif field.type.is_primitive_type()]@
+@[        elif field.type.is_primitive_type()]@
       dds_message->@(field.name)_[i] = ros_i;
-@[      else]@
-      //dds_message->@(field.name)_[i] = (@(field.type.pkg_name)_msg_dds__@(field.type.type)_ *)calloc(1, sizeof(@(field.type.pkg_name)_msg_dds__@(field.type.type)_));
+@[        else]@
       dds_message->@(field.name)_[i] = static_cast<@(field.type.pkg_name)_msg_dds__@(field.type.type)_ *>(@(field.type.pkg_name)__msg__@(field.type.type)__callbacks->alloc());
       if(!@(field.type.pkg_name)__msg__@(field.type.type)__callbacks->convert_ros_to_dds(&ros_i, dds_message->@(field.name)_[i]))
         return false;
-@[      end if]@
+@[        end if]@
     }
+@[      end if]@
 @[    else]@
 @[      if field.type.is_primitive_type() and field.type.type != 'string']@
     if(!dds_@(seq_name)Seq_add_array(dds_message->@(field.name)_, (dds_@(seq_name)*)ros_message->@(field.name).data, len))
@@ -352,6 +356,9 @@ else:
 
 @[    if (not field.type.array_size or field.type.is_upper_bound) and (field.type.is_primitive_type() and field.type.type != 'string')]@
     dds_@(seq_name)Seq_get_array(dds_message->@(field.name)_, (dds_@(seq_name)*)ros_message->@(field.name).data, 0, len);
+@[    elif (field.type.array_size and not field.type.is_upper_bound) and (field.type.is_primitive_type() and field.type.type != 'string')]@
+    (void)len;
+    memcpy(ros_message->@(field.name), dds_message->@(field.name)_, sizeof(dds_message->@(field.name)_));
 @[    else]@
     for(uint32_t i = 0; i < len; i++) {
 @[      if field.type.array_size and not field.type.is_upper_bound]@
