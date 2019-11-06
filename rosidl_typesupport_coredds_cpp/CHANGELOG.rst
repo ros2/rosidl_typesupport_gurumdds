@@ -2,8 +2,8 @@
 Changelog for package rosidl_typesupport_coredds_cpp
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.8.0 (2019-11-06)
+------------------
 * added changelog
 * added coredds dependency to package.xml
 * rewrote build scripts

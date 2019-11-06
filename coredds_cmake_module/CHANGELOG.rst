@@ -2,8 +2,8 @@
 Changelog for package coredds_cmake_module
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.8.0 (2019-11-06)
+------------------
 * added changelog
 * added coredds dependency to package.xml
 * rewrote build scripts
