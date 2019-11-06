@@ -24,9 +24,8 @@
 # Output variables:
 #
 # - CoreDDS_FOUND: flag indicating if the package was found
-# - CoreDDS_INCLUDE_DIR: Paths to the header files
-# - CoreDDS_LIBRARIES: Name to the C++ library including the path
-# - CoreDDS_LIBRARY_DIRS: Path to the library
+# - CoreDDS_INCLUDE_DIR: Path to the header files
+# - CoreDDS_LIBRARIES: Path to the library
 # - CoreDDS_COREIDL: Path to the idl2code generator
 #
 # Example usage:
@@ -49,19 +48,25 @@ file(TO_CMAKE_PATH "$ENV{COREDDS_HOME}" _COREDDS_HOME)
 if(NOT _COREDDS_HOME STREQUAL "")
   message(STATUS "Found CoreDDS:" ${_COREDDS_HOME})
   set(CoreDDS_HOME "${_COREDDS_HOME}")
-  set(CoreDDS_INCLUDE_DIR "${_COREDDS_HOME}/include/")
+  set(CoreDDS_INCLUDE_DIR "${_COREDDS_HOME}/include/dds/")
   set(CoreDDS_LIBRARY_DIRS "${_COREDDS_HOME}/lib/")
-  set(CoreDDS_LIBRARIES "${CoreDDS_LIBRARY_DIRS}libdds.so")
+  if(WIN32)
+    set(ext "lib")
+  elseif(APPLE)
+    message(FATAL_ERROR "This operating system is not supported yet.")
+    return()
+  else() # Linux
+    set(ext "so")
+  endif()
+  set(CoreDDS_LIBRARIES "${CoreDDS_LIBRARY_DIRS}libdds.${ext}")
 
   file(GLOB library "${CoreDDS_LIBRARIES}")
   if(library)
     set(CoreDDS_FOUND TRUE)
-  else()
+  else() # Platform-specific directories: might be changed later
     set(os_dir "")
     if(WIN32)
-      # TODO(clemjh): Support for Windows
-      message(FATAL_ERROR "This operating system is not supported yet.")
-      return()
+      set(os_dir "windows/")
     else()
       if(APPLE)
         message(FATAL_ERROR "This operating system is not supported yet.")
@@ -85,7 +90,7 @@ if(NOT _COREDDS_HOME STREQUAL "")
       endif()
     endif()
     set(CoreDDS_LIBRARY_DIRS "${CoreDDS_LIBRARY_DIRS}${os_dir}")
-    set(CoreDDS_LIBRARIES "${CoreDDS_LIBRARY_DIRS}libdds.so")
+    set(CoreDDS_LIBRARIES "${CoreDDS_LIBRARY_DIRS}libdds.${ext}")
 
     file(GLOB library "${CoreDDS_LIBRARIES}")
     if(library)
@@ -97,18 +102,40 @@ if(NOT _COREDDS_HOME STREQUAL "")
   endif()
 
   if(WIN32)
-    # TODO(clemjh): CoreIDL support for Windows
+    set(CoreDDS_COREIDL "${_COREDDS_HOME}/tools/coreidl.exe")
+    if(NOT EXISTS "${CoreDDS_COREIDL}")
+      set(CoreDDS_COREIDL "${_COREDDS_HOME}/tool/coreidl.exe")
+      if(NOT EXISTS "${CoreDDS_COREIDL}")
+        message(FATAL_ERROR "Could not find executable 'CoreIDL'")
+      endif()
+    endif()
   else()
     set(CoreDDS_COREIDL "${_COREDDS_HOME}/tools/coreidl")
     if(NOT EXISTS "${CoreDDS_COREIDL}")
       set(CoreDDS_COREIDL "${_COREDDS_HOME}/tool/coreidl")
       if(NOT EXISTS "${CoreDDS_COREIDL}")
-        message(FATAL_ERROR "Could not find executable 'CoreIDL'")
+        set(CoreDDS_COREIDL "${_COREDDS_HOME}/bin/coreidl")
+        if(NOT EXISTS "${CoreDDS_COREIDL}")
+          message(FATAL_ERROR "Could not find executable 'CoreIDL'")
+        endif()
       endif()
     endif()
   endif()
 else()
-  set(CoreDDS_FOUND FALSE)
+  if(WIN32)
+    set(CoreDDS_FOUND FALSE)
+  else()
+    find_package(coredds REQUIRED PATHS /usr /usr/local)
+    if(coredds_FOUND)
+      set(CoreDDS_HOME "${COREDDS_CONFIG_ROOT_DIR}")
+      set(CoreDDS_INCLUDE_DIR ${COREDDS_INCLUDE_DIR})
+      set(CoreDDS_LIBRARIES ${COREDDS_LIBRARY})
+      set(CoreDDS_COREIDL ${COREDDS_COREIDL})
+      set(CoreDDS_FOUND TRUE)
+    else()
+      set(CoreDDS_FOUND FALSE)
+    endif()
+  endif()
 endif()
 
 include(FindPackageHandleStandardArgs)
@@ -116,6 +143,5 @@ find_package_handle_standard_args(CoreDDS
   FOUND_VAR CoreDDS_FOUND
   REQUIRED_VARS
   CoreDDS_INCLUDE_DIR
-  CoreDDS_LIBRARY_DIRS
   CoreDDS_LIBRARIES
 )
