@@ -2,6 +2,11 @@
 Changelog for package rosidl_typesupport_gurumdds_c
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.8.1 (2019-11-15)
+------------------
+* CoreDDS is renamed to GurumDDS
+* Contributors: junho
+
 0.8.0 (2019-11-06)
 ------------------
 * added changelog
