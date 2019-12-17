@@ -17,7 +17,7 @@
 
 #include <string>
 
-#include "dds/dcps.h"
+#include "gurumdds/dcps.h"
 #include "rosidl_typesupport_gurumdds_cpp/visibility_control.h"
 
 namespace rosidl_typesupport_gurumdds_cpp

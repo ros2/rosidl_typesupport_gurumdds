@@ -15,7 +15,7 @@
 #ifndef ROSIDL_TYPESUPPORT_GURUMDDS_C__WSTRING_CONVERSION_HPP_
 #define ROSIDL_TYPESUPPORT_GURUMDDS_C__WSTRING_CONVERSION_HPP_
 
-#include "dds/dcps.h"
+#include "gurumdds/dcps.h"
 #include "rosidl_generator_c/u16string.h"
 #include "rosidl_generator_c/u16string_functions.h"
 #include "rosidl_typesupport_gurumdds_cpp/visibility_control.h"
