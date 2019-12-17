@@ -49,7 +49,7 @@ header_guard_variable = '__'.join([x.upper() for x in header_guard_parts]) + '_'
 
 #include "@(spec.base_type.pkg_name)/@(subfolder)/dds_gurumdds/include/@(spec.base_type.pkg_name)/@(subfolder)/dds_/@(spec.base_type.type)_TypeSupport.h"
 #include "@(spec.base_type.pkg_name)/@(subfolder)/dds_gurumdds/include/@(spec.base_type.pkg_name)/@(subfolder)/dds_/@(spec.base_type.type)_.h"
-#include <dds/dcps.h>
+#include <gurumdds/dcps.h>
 
 #ifndef _WIN32
 # pragma GCC diagnostic pop

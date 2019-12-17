@@ -1,4 +1,4 @@
-_BUILDTIME_GURUMDDS_HOME="@gurumdds_HOME@"
+_BUILDTIME_GURUMDDS_HOME="@GurumDDS_HOME@"
 
 # Give priority to the GurumDDS installation found when the workspace was built, if it's valid.
 # If it's not valid, the current value of the GURUMDDS_HOME environment variable will be used.

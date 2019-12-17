@@ -15,7 +15,7 @@
 #ifndef ROSIDL_TYPESUPPORT_GURUMDDS_CPP__MESSAGE_TYPE_SUPPORT_H_
 #define ROSIDL_TYPESUPPORT_GURUMDDS_CPP__MESSAGE_TYPE_SUPPORT_H_
 
-#include <dds/dcps.h>
+#include <gurumdds/dcps.h>
 #include "rosidl_generator_c/message_type_support_struct.h"
 #include "rcutils/types/uint8_array.h"
 

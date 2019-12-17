@@ -19,14 +19,13 @@ gurumdds
 ├── examples
 │   └── ...
 ├── include
-│   ├── dds
-│   │   ├── dcps.h
-│   │   ├── dcpsx.h
-│   │   └── typesupport.h
-│   └── ddsxml
-│       └── ddsxml.h
+│   └── gurumdds
+│       ├── dcps.h
+│       ├── dcpsx.h
+│       ├── typesupport.h
+│       └── xml.h
 ├── lib
-│   └── libdds.so
+│   └── libgurumdds.so
 ├── Makefile
 └── tool
     └── gurumidl
