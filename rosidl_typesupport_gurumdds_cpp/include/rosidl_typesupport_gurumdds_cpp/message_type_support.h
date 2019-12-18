@@ -16,7 +16,7 @@
 #define ROSIDL_TYPESUPPORT_GURUMDDS_CPP__MESSAGE_TYPE_SUPPORT_H_
 
 #include "rosidl_generator_c/message_type_support_struct.h"
-#include <dds/dcps.h>
+#include <gurumdds/dcps.h>
 #include "rcutils/types/uint8_array.h"
 
 typedef struct message_type_support_callbacks_t

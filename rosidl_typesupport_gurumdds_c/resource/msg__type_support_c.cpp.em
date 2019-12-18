@@ -34,7 +34,7 @@ if message.structure.namespaced_type.namespaces[1] == 'msg':
     dds_specific_header_files = [
         include_base + '/dds_gurumdds/include/' + '/'.join(message.structure.namespaced_type.namespaces) + '/dds_/' + interface_path.stem + '_TypeSupport.h',
         include_base + '/dds_gurumdds/include/' + '/'.join(message.structure.namespaced_type.namespaces) + '/dds_/' + interface_path.stem + '_.h',
-        'dds/dcps.h'
+        'gurumdds/dcps.h'
     ]
 elif message.structure.namespaced_type.namespaces[1] == 'srv':
     dds_specific_header_files = [
@@ -42,13 +42,13 @@ elif message.structure.namespaced_type.namespaces[1] == 'srv':
         include_base + '/dds_gurumdds/include/' + '/'.join(message.structure.namespaced_type.namespaces) + '/dds_/' + interface_path.stem + '_Request_.h',
         include_base + '/dds_gurumdds/include/' + '/'.join(message.structure.namespaced_type.namespaces) + '/dds_/' + interface_path.stem + '_Response_TypeSupport.h',
         include_base + '/dds_gurumdds/include/' + '/'.join(message.structure.namespaced_type.namespaces) + '/dds_/' + interface_path.stem + '_Response_.h',
-        'dds/dcps.h'
+        'gurumdds/dcps.h'
     ]
 elif message.structure.namespaced_type.namespaces[1] == 'action':
     for __suffix in ['_Goal',  '_SendGoal_Request', '_SendGoal_Response', '_Result', '_GetResult_Request', '_GetResult_Response', '_Feedback', '_FeedbackMessage']:
         dds_specific_header_files.append(include_base + '/dds_gurumdds/include/' + '/'.join(message.structure.namespaced_type.namespaces) + '/dds_/' + interface_path.stem + __suffix + '_TypeSupport.h')
         dds_specific_header_files.append(include_base + '/dds_gurumdds/include/' + '/'.join(message.structure.namespaced_type.namespaces) + '/dds_/' + interface_path.stem + __suffix + '_.h')
-    dds_specific_header_files.append('dds/dcps.h')
+    dds_specific_header_files.append('gurumdds/dcps.h')
 }@
 @[for header_file in header_files]@
 @[    if header_file in include_directives]@

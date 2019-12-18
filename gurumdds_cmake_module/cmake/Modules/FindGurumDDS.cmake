@@ -58,7 +58,7 @@ if(NOT _GURUMDDS_HOME STREQUAL "")
   else() # Linux
     set(ext "so")
   endif()
-  set(GurumDDS_LIBRARIES "${GurumDDS_LIBRARY_DIRS}libdds.${ext}")
+  set(GurumDDS_LIBRARIES "${GurumDDS_LIBRARY_DIRS}libgurumdds.${ext}")
 
   file(GLOB library "${GurumDDS_LIBRARIES}")
   if(library)
@@ -90,7 +90,7 @@ if(NOT _GURUMDDS_HOME STREQUAL "")
       endif()
     endif()
     set(GurumDDS_LIBRARY_DIRS "${GurumDDS_LIBRARY_DIRS}${os_dir}")
-    set(GurumDDS_LIBRARIES "${GurumDDS_LIBRARY_DIRS}libdds.${ext}")
+    set(GurumDDS_LIBRARIES "${GurumDDS_LIBRARY_DIRS}libgurumdds.${ext}")
 
     file(GLOB library "${GurumDDS_LIBRARIES}")
     if(library)
