@@ -35,6 +35,6 @@ gurumdds
 `rosidl_typesupport_gurumdds_c` and `rosidl_typesupport_gurumdds_cpp` generate C and C++ interfaces using GurumIDL, the preprocessor. These interfaces are used by `rmw_gurumdds`. For more information, see README.md of the [project](https://github.com/gurumnet/rmw_gurumdds)
 
 ## Branches
-There are three branches in this project: master, dashing, and crystal.  
-New changes made in [ROS2 repository](https://github.com/ros2) will be applied to the mater branch, so this branch might be unstable.
-If you want to use this project with ROS2 Dashing Diademata or Crystal Clemmys, please use dashing or crystal branch.
+There are four branches in this project: master, eloquent, dashing, and crystal.  
+New changes made in [ROS2 repository](https://github.com/ros2) will be applied to the master branch, so this branch might be unstable.
+If you want to use this project with ROS2 Eloquent Elusor, Dashing Diademata or Crystal Clemmys, please use eloquent, dashing or crystal branch.
