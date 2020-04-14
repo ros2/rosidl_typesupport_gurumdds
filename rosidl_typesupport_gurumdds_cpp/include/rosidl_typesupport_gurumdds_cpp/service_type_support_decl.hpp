@@ -15,7 +15,7 @@
 #ifndef ROSIDL_TYPESUPPORT_GURUMDDS_CPP__SERVICE_TYPE_SUPPORT_DECL_HPP_
 #define ROSIDL_TYPESUPPORT_GURUMDDS_CPP__SERVICE_TYPE_SUPPORT_DECL_HPP_
 
-#include <rosidl_generator_c/service_type_support_struct.h>
+#include <rosidl_runtime_c/service_type_support_struct.h>
 #include <rosidl_typesupport_gurumdds_cpp/visibility_control.h>
 
 namespace rosidl_typesupport_gurumdds_cpp

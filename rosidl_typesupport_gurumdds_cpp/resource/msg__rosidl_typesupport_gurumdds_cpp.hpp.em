@@ -1,16 +1,13 @@
 @# Included from rosidl_typesupport_gurumdds_cpp/resource/idl__rosidl_typesupport_gurumdds_cpp.hpp.em
 @{
 from rosidl_cmake import convert_camel_case_to_lower_case_underscore
-from rosidl_generator_c import idl_structure_type_to_c_include_prefix
-from rosidl_generator_c import idl_structure_type_to_c_typename
-from rosidl_generator_c import idl_type_to_c
 from rosidl_parser.definition import AbstractNestedType
 from rosidl_parser.definition import NamespacedType
 include_parts = [package_name] + list(interface_path.parents[0].parts)
 include_base = '/'.join(include_parts)
 header_filename = convert_camel_case_to_lower_case_underscore(interface_path.stem)
 header_files = [
-    'rosidl_generator_c/message_type_support_struct.h',
+    'rosidl_runtime_c/message_type_support_struct.h',
     'rosidl_typesupport_interface/macros.h',
     package_name + '/msg/rosidl_typesupport_gurumdds_cpp__visibility_control.h',
     include_base + '/' + header_filename + '__struct.hpp'

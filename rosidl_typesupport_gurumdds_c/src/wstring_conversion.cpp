@@ -19,7 +19,7 @@
 namespace rosidl_typesupport_gurumdds_c
 {
 
-dds_Wstring create_wstring_from_u16string(const rosidl_generator_c__U16String & u16str)
+dds_Wstring create_wstring_from_u16string(const rosidl_runtime_c__U16String & u16str)
 {
   dds_Wstring wstr = (dds_Wstring)calloc(u16str.size + 1, sizeof(dds_Wchar));
   if (wstr == NULL) {
@@ -34,7 +34,7 @@ dds_Wstring create_wstring_from_u16string(const rosidl_generator_c__U16String & 
   return wstr;
 }
 
-bool convert_wstring_to_u16string(const dds_Wstring wstr, rosidl_generator_c__U16String & u16str)
+bool convert_wstring_to_u16string(const dds_Wstring wstr, rosidl_runtime_c__U16String & u16str)
 {
   size_t size = 0;
   if (wstr != NULL) {
@@ -45,7 +45,7 @@ bool convert_wstring_to_u16string(const dds_Wstring wstr, rosidl_generator_c__U1
     }
   }
 
-  bool succeeded = rosidl_generator_c__U16String__resize(&u16str, size);
+  bool succeeded = rosidl_runtime_c__U16String__resize(&u16str, size);
   if (!succeeded) {
     return false;
   }

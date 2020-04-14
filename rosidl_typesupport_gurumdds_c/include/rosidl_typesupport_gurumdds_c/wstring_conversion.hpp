@@ -16,8 +16,8 @@
 #define ROSIDL_TYPESUPPORT_GURUMDDS_C__WSTRING_CONVERSION_HPP_
 
 #include "gurumdds/dcps.h"
-#include "rosidl_generator_c/u16string.h"
-#include "rosidl_generator_c/u16string_functions.h"
+#include "rosidl_runtime_c/u16string.h"
+#include "rosidl_runtime_c/u16string_functions.h"
 #include "rosidl_typesupport_gurumdds_cpp/visibility_control.h"
 
 namespace rosidl_typesupport_gurumdds_c
@@ -25,11 +25,11 @@ namespace rosidl_typesupport_gurumdds_c
 
 ROSIDL_TYPESUPPORT_GURUMDDS_CPP_PUBLIC
 dds_Wstring create_wstring_from_u16string(
-  const rosidl_generator_c__U16String & u16str);
+  const rosidl_runtime_c__U16String & u16str);
 
 ROSIDL_TYPESUPPORT_GURUMDDS_CPP_PUBLIC
 bool convert_wstring_to_u16string(
-  const dds_Wstring wstr, rosidl_generator_c__U16String & u16str);
+  const dds_Wstring wstr, rosidl_runtime_c__U16String & u16str);
 
 }  // namespace rosidl_typesupport_gurumdds_c
 

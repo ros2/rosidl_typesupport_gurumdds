@@ -95,18 +95,18 @@ from collections import OrderedDict
 includes = OrderedDict()
 for member in message.structure.members:
     if isinstance(member.type, AbstractSequence) and isinstance(member.type.value_type, BasicType):
-       includes.setdefault('rosidl_generator_c/primitives_sequence.h', []).append(member.name)
-       includes.setdefault('rosidl_generator_c/primitives_sequence_functions.h', []).append(member.name)
+       includes.setdefault('rosidl_runtime_c/primitives_sequence.h', []).append(member.name)
+       includes.setdefault('rosidl_runtime_c/primitives_sequence_functions.h', []).append(member.name)
        continue
     type_ = member.type
     if isinstance(type_, AbstractNestedType):
        type_ = type_.value_type
     if isinstance(type_, AbstractString):
-        includes.setdefault('rosidl_generator_c/string.h', []).append(member.name)
-        includes.setdefault('rosidl_generator_c/string_functions.h', []).append(member.name)
+        includes.setdefault('rosidl_runtime_c/string.h', []).append(member.name)
+        includes.setdefault('rosidl_runtime_c/string_functions.h', []).append(member.name)
     if isinstance(type_, AbstractWString):
-        includes.setdefault('rosidl_generator_c/u16string.h', []).append(member.name)
-        includes.setdefault('rosidl_generator_c/u16string_functions.h', []).append(member.name)
+        includes.setdefault('rosidl_runtime_c/u16string.h', []).append(member.name)
+        includes.setdefault('rosidl_runtime_c/u16string_functions.h', []).append(member.name)
     if isinstance(type_, NamespacedType):
         include_prefix = idl_structure_type_to_c_include_prefix(type_)
         if include_prefix.endswith('__request'):
@@ -276,7 +276,7 @@ else:
 @[      else]@
     for (uint32_t i = 0; i < static_cast<uint32_t>(size); ++i) {
 @[        if isinstance(type_, AbstractString)]@
-      const rosidl_generator_c__String * str = &ros_message->@(member.name)[i];
+      const rosidl_runtime_c__String * str = &ros_message->@(member.name)[i];
       if (str->capacity == 0 || str->capacity <= str->size) {
         fprintf(stderr, "string capacity not greater than size\n");
         return false;
@@ -288,7 +288,7 @@ else:
 
       dds_message->@(member.name)_[i] = strdup(str->data);
 @[        elif isinstance(type_, AbstractWString)]@
-      const rosidl_generator_c__U16String * str = &ros_message->@(member.name)[i];
+      const rosidl_runtime_c__U16String * str = &ros_message->@(member.name)[i];
       if (str->capacity == 0 || str->capacity <= str->size) {
         fprintf(stderr, "string capacity not greater than size\n");
         return false;
@@ -325,7 +325,7 @@ else:
     dds_message->@(member.name)_ = dds_@(seq_name)Seq_create(8);
     for (uint32_t i = 0; i < static_cast<uint32_t>(size); ++i) {
 @[        if isinstance(type_, AbstractString)]@
-      const rosidl_generator_c__String * str = &ros_message->@(member.name).data[i];
+      const rosidl_runtime_c__String * str = &ros_message->@(member.name).data[i];
       if (str->capacity == 0 || str->capacity <= str->size) {
         fprintf(stderr, "string capacity not greater than size\n");
         return false;
@@ -336,7 +336,7 @@ else:
       }
       dds_StringSeq_add(dds_message->@(member.name)_, strdup(str->data));
 @[        elif isinstance(type_, AbstractWString)]@
-      const rosidl_generator_c__U16String * str = &ros_message->@(member.name).data[i];
+      const rosidl_runtime_c__U16String * str = &ros_message->@(member.name).data[i];
       if (str->capacity == 0 || str->capacity <= str->size) {
         fprintf(stderr, "string capacity not greater than size\n");
         return false;
@@ -363,7 +363,7 @@ else:
 @[      end if]@
 @[    end if]@
 @[  elif isinstance(member.type, AbstractString)]@
-    const rosidl_generator_c__String * str = &ros_message->@(member.name);
+    const rosidl_runtime_c__String * str = &ros_message->@(member.name);
     if (str->capacity == 0 || str->capacity <= str->size) {
       fprintf(stderr, "string capacity not greater than size\n");
       return false;
@@ -377,7 +377,7 @@ else:
     }
     dds_message->@(member.name)_ = strdup(str->data);
 @[  elif isinstance(member.type, AbstractWString)]@
-    const rosidl_generator_c__U16String * str = &ros_message->@(member.name);
+    const rosidl_runtime_c__U16String * str = &ros_message->@(member.name);
     if (str->capacity == 0 || str->capacity <= str->size) {
       fprintf(stderr, "string capacity not greater than size\n");
       return false;
@@ -512,16 +512,16 @@ else:
 @[        end if]@
 @[      elif isinstance(type_, AbstractString)]@
       if (!ros_i.data) {
-        rosidl_generator_c__String__init(&ros_i);
+        rosidl_runtime_c__String__init(&ros_i);
       }
-      bool succeeded = rosidl_generator_c__String__assign(&ros_i, dds_i);
+      bool succeeded = rosidl_runtime_c__String__assign(&ros_i, dds_i);
       if (!succeeded) {
         fprintf(stderr, "failed to assign string into field '@(member.name)'\n");
         return false;
       }
 @[      elif isinstance(type_, AbstractWString)]@
       if (!ros_i.data) {
-        rosidl_generator_c__U16String__init(&ros_i);
+        rosidl_runtime_c__U16String__init(&ros_i);
       }
       if (!rosidl_typesupport_gurumdds_c::convert_wstring_to_u16string(dds_i, ros_i)) {
         fprintf(stderr, "failed to convert dds_Wstring to u16string\n");
@@ -538,16 +538,16 @@ else:
 @[    end if]@
 @[  elif isinstance(member.type, AbstractString)]@
     if (!ros_message->@(member.name).data) {
-      rosidl_generator_c__String__init(&ros_message->@(member.name));
+      rosidl_runtime_c__String__init(&ros_message->@(member.name));
     }
-    bool succeeded = rosidl_generator_c__String__assign(&ros_message->@(member.name), dds_message->@(member.name)_);
+    bool succeeded = rosidl_runtime_c__String__assign(&ros_message->@(member.name), dds_message->@(member.name)_);
     if (!succeeded) {
       fprintf(stderr, "failed to assign string into field '@(member.name)'\n");
       return false;
     }
 @[  elif isinstance(member.type, AbstractWString)]@
     if (!ros_message->@(member.name).data) {
-      rosidl_generator_c__U16String__init(&ros_message->@(member.name));
+      rosidl_runtime_c__U16String__init(&ros_message->@(member.name));
     }
     if (!rosidl_typesupport_gurumdds_c::convert_wstring_to_u16string(dds_message->@(member.name)_, ros_message->@(member.name))) {
       fprintf(stderr, "failed to convert dds_Wstring to u16string\n");

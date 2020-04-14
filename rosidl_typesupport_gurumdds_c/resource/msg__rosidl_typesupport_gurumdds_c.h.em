@@ -1,7 +1,7 @@
 @# Included from rosidl_typesupport_gurumdds_c/resource/idl__rosidl_typesupport_gurumdds_c.h.em
 @{
 header_files = [
-    'rosidl_generator_c/message_type_support_struct.h',
+    'rosidl_runtime_c/message_type_support_struct.h',
     'rosidl_typesupport_interface/macros.h',
     package_name + '/msg/rosidl_typesupport_gurumdds_c__visibility_control.h'
 ]
