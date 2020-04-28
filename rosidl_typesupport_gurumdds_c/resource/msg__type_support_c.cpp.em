@@ -25,8 +25,8 @@ header_files = [
     'rosidl_typesupport_gurumdds_c/wstring_conversion.hpp',
     'rosidl_typesupport_gurumdds_cpp/message_type_support.h',
     package_name + '/msg/rosidl_typesupport_gurumdds_c__visibility_control.h',
-    include_base + '/' + c_include_prefix + '__struct.h',
-    include_base + '/' + c_include_prefix + '__functions.h',
+    include_base + '/detail/' + c_include_prefix + '__struct.h',
+    include_base + '/detail/' + c_include_prefix + '__functions.h',
 ]
 
 dds_specific_header_files = []
@@ -109,16 +109,9 @@ for member in message.structure.members:
         includes.setdefault('rosidl_runtime_c/u16string_functions.h', []).append(member.name)
     if isinstance(type_, NamespacedType):
         include_prefix = idl_structure_type_to_c_include_prefix(type_)
-        if include_prefix.endswith('__request'):
-            include_prefix = include_prefix[:-9]
-        elif include_prefix.endswith('__response'):
-            include_prefix = include_prefix[:-10]
-        if include_prefix.endswith('__goal'):
-            include_prefix = include_prefix[:-6]
-        elif include_prefix.endswith('__result'):
-            include_prefix = include_prefix[:-8]
-        elif include_prefix.endswith('__feedback'):
-            include_prefix = include_prefix[:-10]
+        ip_list = include_prefix.split('/')
+        ip_list[-2] += '/detail'
+        include_prefix = '/'.join(ip_list)
         includes.setdefault(include_prefix + '__struct.h', []).append(member.name)
         includes.setdefault(include_prefix + '__functions.h', []).append(member.name)
 }@
