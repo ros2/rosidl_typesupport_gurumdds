@@ -7,7 +7,7 @@
   <maintainer email="junhui@gurum.cc">junhui</maintainer>
   <license>Apache License 2.0</license>
 
-  <buildtool_depend>gurumdds-2.5</buildtool_depend>
+  <buildtool_depend>gurumdds-2.6</buildtool_depend>
   <buildtool_depend>ament_cmake</buildtool_depend>
   <buildtool_depend>gurumdds_cmake_module</buildtool_depend>
   <buildtool_depend>rosidl_cmake</buildtool_depend>
