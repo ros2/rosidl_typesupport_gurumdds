@@ -2,6 +2,9 @@
 Changelog for package gurumdds_cmake_module
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.8.4 (2020-07-06)
+------------------
+
 0.8.3 (2020-06-04)
 ------------------
 * Updated packages to use gurumdds-2.6
