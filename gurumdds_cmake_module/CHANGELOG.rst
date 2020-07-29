@@ -2,6 +2,11 @@
 Changelog for package gurumdds_cmake_module
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.8.5 (2020-07-29)
+------------------
+* Change maintainer
+* Contributors: junho
+
 0.8.4 (2020-07-06)
 ------------------
 
