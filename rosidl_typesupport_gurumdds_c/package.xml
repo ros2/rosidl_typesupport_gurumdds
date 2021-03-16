@@ -4,7 +4,7 @@
   <name>rosidl_typesupport_gurumdds_c</name>
   <version>0.8.3</version>
   <description>Generate the C interfaces for GurumNetworks GurumDDS.</description>
-  <maintainer email="junho@gurum.cc">Junho Lee</maintainer>
+  <maintainer email="youngjin@gurum.cc">Youngjin Yun</maintainer>
   <license>Apache License 2.0</license>
 
   <buildtool_depend>gurumdds-2.6</buildtool_depend>

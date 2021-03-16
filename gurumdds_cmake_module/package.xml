@@ -4,7 +4,7 @@
   <name>gurumdds_cmake_module</name>
   <version>0.8.5</version>
   <description>Provide CMake module to find GurumNetworks GurumDDS.</description>
-  <maintainer email="junho@gurum.cc">Junho Lee</maintainer>
+  <maintainer email="youngjin@gurum.cc">Youngjin Yun</maintainer>
   <license>Apache License 2.0</license>
 
   <buildtool_depend>ament_cmake</buildtool_depend>
