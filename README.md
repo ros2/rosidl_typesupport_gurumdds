@@ -31,10 +31,10 @@ gurumdds
     └── gurumidl
 ```
 
-### rosidl_typesupport_gurumdds_c and rosidl_typesupport_gurumdds_cpp
-`rosidl_typesupport_gurumdds_c` and `rosidl_typesupport_gurumdds_cpp` generate C and C++ interfaces using GurumIDL, the preprocessor. These interfaces are used by `rmw_gurumdds`. For more information, see README.md of the [project](https://github.com/gurumnet/rmw_gurumdds)
+### rosidl_typesupport_gurumdds_c and rosidl_typesupport_gurumdds_cpp(deprecated)
+~~`rosidl_typesupport_gurumdds_c` and `rosidl_typesupport_gurumdds_cpp` generate C and C++ interfaces using GurumIDL, the preprocessor. These interfaces are used by `rmw_gurumdds`. For more information, see README.md of the [project](https://github.com/ros2/rmw_gurumdds)~~
 
 ## Branches
-There are three active branches in this project: master, galactic and foxy.
-New changes made in [ROS2 repository](https://github.com/ros2) will be applied to the master branch, so this branch might be unstable.
-If you want to use this project with ROS2 Rolling Ridley or Foxy Fitzroy, please use master or foxy branch, respectively.
+There are four active branches in this project: master, humble, galactic and foxy.
+New changes made in [ROS2 repository](https://github.com/ros2) will be applied to the master branch.
+If you want to use this project with ROS2 Rolling Ridley, Humble Hawksbill or Foxy Fitzroy, please use master, humble or foxy branch, respectively.
