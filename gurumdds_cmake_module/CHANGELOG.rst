@@ -2,6 +2,9 @@
 Changelog for package gurumdds_cmake_module
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+4.0.0 (2022-05-09)
+------------------
+
 3.1.0 (2022-01-03)
 ------------------
 * Update packages to use gurumdds-2.8
